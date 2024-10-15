@@ -13,6 +13,12 @@ type Player struct {
 	Name *string `json:"name,omitempty"`
 }
 
+// PlayersResponse defines the model for players_response.
+type PlayersResponse struct {
+	Players []Player `json:"players"`
+	Total   int64    `json:"total"`
+}
+
 // QueryName defines the model for query_name.
 type QueryName = string
 

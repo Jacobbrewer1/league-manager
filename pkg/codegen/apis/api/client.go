@@ -299,7 +299,7 @@ type ClientWithResponsesInterface interface {
 type GetPlayersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *[]Player
+	JSON200      *PlayersResponse
 }
 
 // Status returns HTTPResponse.Status
@@ -342,7 +342,7 @@ func ParseGetPlayersResponse(rsp *http.Response) (*GetPlayersResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []Player
+		var dest PlayersResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
