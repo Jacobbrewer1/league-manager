@@ -34,6 +34,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/players_response'
+    post:
+      tags:
+        - players
+      summary: Create a player
+      operationId: createPlayer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/player'
+      responses:
+        '201':
+          description: Player created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/player'
 
 components:
   parameters:

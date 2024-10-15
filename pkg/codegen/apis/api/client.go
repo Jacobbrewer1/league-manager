@@ -4,6 +4,7 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -90,10 +91,39 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 type ClientInterface interface {
 	// GetPlayers request
 	GetPlayers(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreatePlayerWithBody request with any body
+	CreatePlayerWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreatePlayer(ctx context.Context, body CreatePlayerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) GetPlayers(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetPlayersRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreatePlayerWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreatePlayerRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreatePlayer(ctx context.Context, body CreatePlayerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreatePlayerRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -249,6 +279,46 @@ func NewGetPlayersRequest(server string, params *GetPlayersParams) (*http.Reques
 	return req, nil
 }
 
+// NewCreatePlayerRequest calls the generic CreatePlayer builder with application/json body
+func NewCreatePlayerRequest(server string, body CreatePlayerJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreatePlayerRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreatePlayerRequestWithBody generates requests for CreatePlayer with any type of body
+func NewCreatePlayerRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/players")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -294,6 +364,11 @@ func WithBaseURL(baseURL string) ClientOption {
 type ClientWithResponsesInterface interface {
 	// GetPlayersWithResponse request
 	GetPlayersWithResponse(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*GetPlayersResponse, error)
+
+	// CreatePlayerWithBodyWithResponse request with any body
+	CreatePlayerWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreatePlayerResponse, error)
+
+	CreatePlayerWithResponse(ctx context.Context, body CreatePlayerJSONRequestBody, reqEditors ...RequestEditorFn) (*CreatePlayerResponse, error)
 }
 
 type GetPlayersResponse struct {
@@ -318,6 +393,28 @@ func (r GetPlayersResponse) StatusCode() int {
 	return 0
 }
 
+type CreatePlayerResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *Player
+}
+
+// Status returns HTTPResponse.Status
+func (r CreatePlayerResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreatePlayerResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // GetPlayersWithResponse request returning *GetPlayersResponse
 func (c *ClientWithResponses) GetPlayersWithResponse(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*GetPlayersResponse, error) {
 	rsp, err := c.GetPlayers(ctx, params, reqEditors...)
@@ -325,6 +422,23 @@ func (c *ClientWithResponses) GetPlayersWithResponse(ctx context.Context, params
 		return nil, err
 	}
 	return ParseGetPlayersResponse(rsp)
+}
+
+// CreatePlayerWithBodyWithResponse request with arbitrary body returning *CreatePlayerResponse
+func (c *ClientWithResponses) CreatePlayerWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreatePlayerResponse, error) {
+	rsp, err := c.CreatePlayerWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreatePlayerResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreatePlayerWithResponse(ctx context.Context, body CreatePlayerJSONRequestBody, reqEditors ...RequestEditorFn) (*CreatePlayerResponse, error) {
+	rsp, err := c.CreatePlayer(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreatePlayerResponse(rsp)
 }
 
 // ParseGetPlayersResponse parses an HTTP response from a GetPlayersWithResponse call
@@ -347,6 +461,32 @@ func ParseGetPlayersResponse(rsp *http.Response) (*GetPlayersResponse, error) {
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreatePlayerResponse parses an HTTP response from a CreatePlayerWithResponse call
+func ParseCreatePlayerResponse(rsp *http.Response) (*CreatePlayerResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreatePlayerResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest Player
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
 
 	}
 

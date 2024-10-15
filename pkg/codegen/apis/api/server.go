@@ -4,6 +4,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -17,6 +18,9 @@ type ServerInterface interface {
 	// Get all players
 	// (GET /players)
 	GetPlayers(w http.ResponseWriter, r *http.Request, params GetPlayersParams)
+	// Create a player
+	// (POST /players)
+	CreatePlayer(w http.ResponseWriter, r *http.Request, body0 *CreatePlayerJSONBody)
 }
 
 type RateLimiterFunc = func(http.ResponseWriter, *http.Request) error
@@ -146,6 +150,35 @@ func (siw *ServerInterfaceWrapper) GetPlayers(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(cw, r.WithContext(ctx))
 }
 
+// CreatePlayer operation middleware
+func (siw *ServerInterfaceWrapper) CreatePlayer(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	// ------------- Body parameter for CreatePlayer for application/json ContentType -------------
+	body := new(CreatePlayerJSONRequestBody)
+	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+		siw.errorHandlerFunc(cw, r, &UnmarshalingParamError{ParamName: "body", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.CreatePlayer(cw, r, body)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -265,4 +298,6 @@ func RegisterUnauthedHandlers(router *mux.Router, si ServerInterface, opts ...Se
 	// We do not have a gateway preparer here as no auth is sent.
 
 	router.Methods(http.MethodGet).Path("/players").Handler(wrapHandler(wrapper.GetPlayers))
+
+	router.Methods(http.MethodPost).Path("/players").Handler(wrapHandler(wrapper.CreatePlayer))
 }

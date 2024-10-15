@@ -51,3 +51,9 @@ type GetPlayersParams struct {
 
 // GetPlayersParamsSortDir defines parameters for GetPlayers.
 type GetPlayersParamsSortDir string
+
+// CreatePlayerJSONRequestBody defines body for CreatePlayer for application/json ContentType.
+type CreatePlayerJSONRequestBody = Player
+
+// Temporary inclusion of type alias for backwards compatibility
+type CreatePlayerJSONBody = Player
