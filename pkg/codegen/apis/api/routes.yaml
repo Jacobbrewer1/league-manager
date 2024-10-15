@@ -72,6 +72,20 @@ components:
         type: string
 
   schemas:
+    players_response:
+      type: object
+      required:
+        - players
+        - total
+      properties:
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/player'
+        total:
+          type: integer
+          format: int64
+
     player:
       type: object
       properties:
