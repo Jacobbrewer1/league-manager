@@ -10,7 +10,9 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/api"
 	"github.com/Jacobbrewer1/league-manager/pkg/logging"
+	svc "github.com/Jacobbrewer1/league-manager/pkg/services/api"
 	"github.com/Jacobbrewer1/uhttp"
 	"github.com/Jacobbrewer1/vaulty"
 	"github.com/Jacobbrewer1/vaulty/repositories"
@@ -139,7 +141,9 @@ func (s *serveCmd) setup(ctx context.Context, r *mux.Router) (err error) {
 		return fmt.Errorf("error connecting to database: %w", err)
 	}
 
-	r := mux.NewRouter()
+	slog.Info("Database connection generate from vault secrets")
+
+	service := svc.NewService()
 
 	r.HandleFunc("/metrics", uhttp.InternalOnly(promhttp.Handler())).Methods(http.MethodGet)
 	r.HandleFunc("/health", uhttp.InternalOnly(healthHandler(db))).Methods(http.MethodGet)
@@ -147,7 +151,12 @@ func (s *serveCmd) setup(ctx context.Context, r *mux.Router) (err error) {
 	r.NotFoundHandler = uhttp.NotFoundHandler()
 	r.MethodNotAllowedHandler = uhttp.MethodNotAllowedHandler()
 
-	slog.Info("Database connection generate from vault secrets")
+	api.RegisterHandlers(
+		r,
+		service,
+		api.WithMetricsMiddleware(metricsMiddleware),
+		api.WithErrorHandlerFunc(uhttp.GenericErrorHandler),
+	)
 
 	return nil
 }

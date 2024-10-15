@@ -215,8 +215,6 @@ func (siw *ServerInterfaceWrapper) {{$opid}}(w http.ResponseWriter, r *http.Requ
     {{end}}
   {{end}}
 
-
-
   handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     {{- if .Spec.Security }}
     if siw.authz != nil {
