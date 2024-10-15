@@ -1,0 +1,2 @@
+import-mapping:
+  "../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml": "github.com/Jacobbrewer1/pagefilter/common"

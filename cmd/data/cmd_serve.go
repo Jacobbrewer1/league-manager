@@ -11,10 +11,12 @@ import (
 	"runtime"
 
 	"github.com/Jacobbrewer1/league-manager/pkg/logging"
+	"github.com/Jacobbrewer1/uhttp"
 	"github.com/Jacobbrewer1/vaulty"
 	"github.com/Jacobbrewer1/vaulty/repositories"
 	"github.com/google/subcommands"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/viper"
 )
 
@@ -132,10 +134,18 @@ func (s *serveCmd) setup(ctx context.Context, r *mux.Router) (err error) {
 		return fmt.Errorf("error creating database connector: %w", err)
 	}
 
-	_, err = dbConnector.ConnectDB()
+	db, err := dbConnector.ConnectDB()
 	if err != nil {
 		return fmt.Errorf("error connecting to database: %w", err)
 	}
+
+	r := mux.NewRouter()
+
+	r.HandleFunc("/metrics", uhttp.InternalOnly(promhttp.Handler())).Methods(http.MethodGet)
+	r.HandleFunc("/health", uhttp.InternalOnly(healthHandler(db))).Methods(http.MethodGet)
+
+	r.NotFoundHandler = uhttp.NotFoundHandler()
+	r.MethodNotAllowedHandler = uhttp.MethodNotAllowedHandler()
 
 	slog.Info("Database connection generate from vault secrets")
 
