@@ -73,9 +73,10 @@ jobs:
           npm install -g ibm-openapi-validator
           npm install @ibm-cloud/openapi-ruleset
 
-      - name: Install JQ
+      - name: Install Dependencies
         run: |
           sudo apt-get install jq
+          make deps
 
       - name: Lint OpenAPI
         shell: bash

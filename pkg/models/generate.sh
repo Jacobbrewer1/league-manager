@@ -17,7 +17,7 @@ fi
 
 # If the "--all" flag is passed, generate all models
 if [ "$1" == "--all" ]; then
-  gum spin "$(goschema generate --templates=./templates/*tmpl --out=./ --sql=./schemas/*.sql)" --spinner dot --title "Generating all models"
+  gum spin --spinner dot --title "Generating all models" -- goschema generate --templates=./templates/*tmpl --out=./ --sql=./schemas/*.sql
   go fmt ./*.go
   goimports -w ./*.go
   exit 0
