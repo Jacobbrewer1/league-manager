@@ -226,3 +226,17 @@ components:
         date_of_birth:
           type: string
           format: date
+
+    team:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        contact_email:
+          type: string
+          format: email
+        contact_phone:
+          type: string
