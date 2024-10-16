@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/Jacobbrewer1/goschema/usql"
+	"github.com/Jacobbrewer1/goschema/pkg/usql"
 	"github.com/prometheus/client_golang/prometheus"
 )
 {{ with .Table }}
@@ -105,13 +105,13 @@ func {{ $struct }}By{{ range $i, $col := $key.Columns }}{{ $col.Name | structify
 {{ $constraint_ref_len := len $constraint.References }}
 {{ if eq $constraint_ref_len 1 -}}
 {{ $foreign_struct := $constraint.ReferenceTable | structify }}
-// Get{{ $foreign_struct }} Gets an instance of {{ $foreign_struct }}
+{{ range $i, $col_data := $.Table.Columns -}}
+{{ range $local_col, $foreign_col := $constraint.References -}}
+{{ if eq $col_data.Name $local_col -}}
+// Get{{ $local_col | structify }}{{ $foreign_struct }} Gets an instance of {{ $foreign_struct }}
 //
 // Generated from constraint {{ $constraint.Name }}
-func (m *{{ $struct }}) Get{{ $foreign_struct }}(db DB) (*{{ $foreign_struct }}, error) {
-  {{ range $i, $col_data := $.Table.Columns -}}
-  {{ range $local_col, $foreign_col := $constraint.References -}}
-  {{ if eq $col_data.Name $local_col -}}
+func (m *{{ $struct }}) Get{{ $local_col | structify }}{{ $foreign_struct }}(db DB) (*{{ $foreign_struct }}, error) {
   {{ if $col_data.Nullable -}}
   if !m.{{ $local_col | structify }}.Valid {
     return nil, nil
@@ -119,10 +119,10 @@ func (m *{{ $struct }}) Get{{ $foreign_struct }}(db DB) (*{{ $foreign_struct }},
 
   {{ end -}}
 	return {{ $foreign_struct }}By{{ $foreign_col | structify }}(db, m.{{ $local_col | structify }}{{ if $col_data.Nullable }}.{{ template "type_reverse_nullable" $col_data }}{{ end }})
-  {{ end -}}
-  {{ end -}}
-  {{ end -}}
 }
+{{ end -}}
+{{ end -}}
+{{ end -}}
 {{- end }}
 {{- end }}
 
