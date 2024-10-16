@@ -23,13 +23,6 @@ type {{ $struct }} struct {
 	{{ end -}}
 }
 
-// {{ $struct }}Columns is the sorted column names for the type {{ $struct }}
-var {{ $struct }}Columns = []string{
-	{{- range $i, $column := sorted_columns . -}}
-		{{ if $i }}, {{ end }}"{{ $column.Name | structify }}"
-	{{- end -}}
-}
-
 {{ template "insert" . }}
 
 {{ if has_primary_key . -}}

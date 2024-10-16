@@ -1,4 +1,4 @@
-create table players
+create table player
 (
     id         int auto_increment
         primary key,
