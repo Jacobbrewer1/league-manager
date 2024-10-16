@@ -1,0 +1,31 @@
+{
+  "error": {
+    "results": [],
+    "summary": {
+      "total": 0,
+      "entries": []
+    }
+  },
+  "warning": {
+    "results": [],
+    "summary": {
+      "total": 0,
+      "entries": []
+    }
+  },
+  "info": {
+    "results": [],
+    "summary": {
+      "total": 0,
+      "entries": []
+    }
+  },
+  "hint": {
+    "results": [],
+    "summary": {
+      "total": 0,
+      "entries": []
+    }
+  },
+  "hasResults": false
+}

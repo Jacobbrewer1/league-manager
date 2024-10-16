@@ -12,7 +12,7 @@ fi
 
 # Check that the IBM OpenAPI Linter is installed
 if ! command -v lint-openapi >/dev/null; then
-  echo "Error: IBM OpenAPI Linter is not installed. Please install the linter by following the instructions at https://github.com/IBM/openapi-validator"
+  gum style --foreground 196 "Error: IBM OpenAPI Linter is not installed. Please install the linter by following the instructions at https://github.com/IBM/openapi-validator"
   exit 1
 fi
 
@@ -36,7 +36,7 @@ for file in $routesFiles; do
   # Make ./pkg/codegen/apis/api/routes.yaml -> api/routes.yaml
   prettyName=$(echo $file | sed 's/\.\/pkg\/codegen\/apis\///' | sed 's/\/routes.yaml//')
 
-  echo "Report for $prettyName"
+  gum style --foreground 10 "Linting $prettyName"
 
   # Print the lint output (Only used when the --debug flag is passed)
   if [[ $debug == true ]]; then
