@@ -67,6 +67,66 @@ func (_m *MockRepository) CreateTeam(team *models.Team) error {
 	return r0
 }
 
+// GetMatches provides a mock function with given fields: details, filters
+func (_m *MockRepository) GetMatches(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Match], error) {
+	ret := _m.Called(details, filters)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetMatches")
+	}
+
+	var r0 *pagefilter.PaginatedResponse[models.Match]
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Match], error)); ok {
+		return rf(details, filters)
+	}
+	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetMatchesFilters) *pagefilter.PaginatedResponse[models.Match]); ok {
+		r0 = rf(details, filters)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*pagefilter.PaginatedResponse[models.Match])
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*pagefilter.PaginatorDetails, *GetMatchesFilters) error); ok {
+		r1 = rf(details, filters)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetPartnership provides a mock function with given fields: id
+func (_m *MockRepository) GetPartnership(id int64) (*models.Partnership, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPartnership")
+	}
+
+	var r0 *models.Partnership
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int64) (*models.Partnership, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int64) *models.Partnership); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Partnership)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetPlayer provides a mock function with given fields: id
 func (_m *MockRepository) GetPlayer(id int64) (*models.Player, error) {
 	ret := _m.Called(id)
@@ -120,6 +180,36 @@ func (_m *MockRepository) GetPlayers(details *pagefilter.PaginatorDetails, filte
 
 	if rf, ok := ret.Get(1).(func(*pagefilter.PaginatorDetails, *GetPlayersFilters) error); ok {
 		r1 = rf(details, filters)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetScoreByMatchAndPartnership provides a mock function with given fields: matchID, partnershipID
+func (_m *MockRepository) GetScoreByMatchAndPartnership(matchID int64, partnershipID int64) (*models.Score, error) {
+	ret := _m.Called(matchID, partnershipID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetScoreByMatchAndPartnership")
+	}
+
+	var r0 *models.Score
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int64, int64) (*models.Score, error)); ok {
+		return rf(matchID, partnershipID)
+	}
+	if rf, ok := ret.Get(0).(func(int64, int64) *models.Score); ok {
+		r0 = rf(matchID, partnershipID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Score)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int64, int64) error); ok {
+		r1 = rf(matchID, partnershipID)
 	} else {
 		r1 = ret.Error(1)
 	}
