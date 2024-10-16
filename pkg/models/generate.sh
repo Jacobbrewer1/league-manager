@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 if ! command -v goschema &> /dev/null; then
   gum style --foreground 196 "goschema is required to generate models. Please install it"

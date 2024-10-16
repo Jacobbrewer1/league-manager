@@ -102,3 +102,29 @@ func (r *repository) CreatePlayer(player *models.Player) error {
 
 	return nil
 }
+
+func (r *repository) GetPlayer(id int64) (*models.Player, error) {
+	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("get_player"))
+	defer t.ObserveDuration()
+
+	player, err := models.PlayerById(r.db, int(id))
+	if err != nil {
+		return nil, fmt.Errorf("get player by ID: %w", err)
+	}
+
+	return player, nil
+}
+
+func (r *repository) UpdatePlayer(id int64, player *models.Player) error {
+	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("update_player"))
+	defer t.ObserveDuration()
+
+	player.Id = int(id)
+	player.UpdatedAt = time.Now().UTC()
+
+	if err := player.Update(r.db); err != nil {
+		return fmt.Errorf("update player: %w", err)
+	}
+
+	return nil
+}

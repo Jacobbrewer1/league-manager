@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"reflect"
 
 	"github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/api"
 	"github.com/Jacobbrewer1/league-manager/pkg/logging"
@@ -12,6 +13,7 @@ import (
 	"github.com/Jacobbrewer1/league-manager/pkg/utils"
 	"github.com/Jacobbrewer1/pagefilter"
 	"github.com/Jacobbrewer1/pagefilter/common"
+	"github.com/Jacobbrewer1/patcher"
 	"github.com/Jacobbrewer1/uhttp"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
@@ -156,4 +158,76 @@ func mapAPIPlayerToModel(player *api.Player) *models.Player {
 	}
 
 	return p
+}
+
+func (s *service) GetPlayerByID(w http.ResponseWriter, r *http.Request, id int64) {
+	l := logging.LoggerFromRequest(r)
+
+	player, err := s.r.GetPlayer(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, repo.ErrPlayerNotFound):
+			uhttp.SendErrorMessageWithStatus(w, http.StatusNotFound, "player not found", err)
+		default:
+			l.Error("Error getting player", slog.String(logging.KeyError, err.Error()))
+			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting player", err)
+		}
+		return
+	}
+
+	resp := modelAsApiPlayer(player)
+
+	if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
+		l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
+		return
+	}
+}
+
+func (s *service) UpdatePlayer(w http.ResponseWriter, r *http.Request, id int64, body0 *api.UpdatePlayerJSONBody) {
+	l := logging.LoggerFromRequest(r)
+
+	currentPlayer, err := s.r.GetPlayer(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, repo.ErrPlayerNotFound):
+			uhttp.SendErrorMessageWithStatus(w, http.StatusNotFound, "player not found", err)
+		default:
+			l.Error("Error getting player", slog.String(logging.KeyError, err.Error()))
+			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting player", err)
+		}
+		return
+	}
+
+	changesModel := mapAPIPlayerToModel(body0)
+	currentPlayerCopy := *currentPlayer
+
+	// Load the changes into the current player
+	if err := patcher.LoadDiff(currentPlayer, changesModel); err != nil {
+		l.Error("Failed to load diff", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusBadRequest, "failed to load diff", err)
+		return
+	}
+
+	// See if there are any changes
+	if reflect.DeepEqual(currentPlayer, &currentPlayerCopy) {
+		l.Info("No changes detected")
+		if err := uhttp.Encode(w, http.StatusOK, modelAsApiPlayer(currentPlayer)); err != nil {
+			l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
+			return
+		}
+		return
+	}
+
+	if err := s.r.UpdatePlayer(id, currentPlayer); err != nil {
+		l.Error("Failed to update player", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to update player", err)
+		return
+	}
+
+	resp := modelAsApiPlayer(currentPlayer)
+
+	if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
+		l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
+		return
+	}
 }

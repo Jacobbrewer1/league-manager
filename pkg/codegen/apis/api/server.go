@@ -21,6 +21,12 @@ type ServerInterface interface {
 	// Create a player
 	// (POST /players)
 	CreatePlayer(w http.ResponseWriter, r *http.Request, body0 *CreatePlayerJSONBody)
+	// Get a player by ID
+	// (GET /players/{id})
+	GetPlayerByID(w http.ResponseWriter, r *http.Request, id int64)
+	// Update a player
+	// (PATCH /players/{id})
+	UpdatePlayer(w http.ResponseWriter, r *http.Request, id int64, body0 *UpdatePlayerJSONBody)
 }
 
 type RateLimiterFunc = func(http.ResponseWriter, *http.Request) error
@@ -179,6 +185,79 @@ func (siw *ServerInterfaceWrapper) CreatePlayer(w http.ResponseWriter, r *http.R
 	handler.ServeHTTP(cw, r.WithContext(ctx))
 }
 
+// GetPlayerByID operation middleware
+func (siw *ServerInterfaceWrapper) GetPlayerByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", mux.Vars(r)["id"], &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.GetPlayerByID(cw, r, id)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
+// UpdatePlayer operation middleware
+func (siw *ServerInterfaceWrapper) UpdatePlayer(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", mux.Vars(r)["id"], &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Body parameter for UpdatePlayer for application/json ContentType -------------
+	body := new(UpdatePlayerJSONRequestBody)
+	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+		siw.errorHandlerFunc(cw, r, &UnmarshalingParamError{ParamName: "body", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.UpdatePlayer(cw, r, id, body)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -297,4 +376,6 @@ func RegisterUnauthedHandlers(router *mux.Router, si ServerInterface, opts ...Se
 
 	router.Methods(http.MethodGet).Path("/players").Handler(wrapHandler(wrapper.GetPlayers))
 	router.Methods(http.MethodPost).Path("/players").Handler(wrapHandler(wrapper.CreatePlayer))
+	router.Methods(http.MethodGet).Path("/players/{id}").Handler(wrapHandler(wrapper.GetPlayerByID))
+	router.Methods(http.MethodPatch).Path("/players/{id}").Handler(wrapHandler(wrapper.UpdatePlayer))
 }

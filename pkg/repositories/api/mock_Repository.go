@@ -31,6 +31,36 @@ func (_m *MockRepository) CreatePlayer(player *models.Player) error {
 	return r0
 }
 
+// GetPlayer provides a mock function with given fields: id
+func (_m *MockRepository) GetPlayer(id int64) (*models.Player, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPlayer")
+	}
+
+	var r0 *models.Player
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int64) (*models.Player, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int64) *models.Player); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Player)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetPlayers provides a mock function with given fields: details, filters
 func (_m *MockRepository) GetPlayers(details *pagefilter.PaginatorDetails, filters *GetPlayersFilters) (*pagefilter.PaginatedResponse[models.Player], error) {
 	ret := _m.Called(details, filters)
@@ -59,6 +89,24 @@ func (_m *MockRepository) GetPlayers(details *pagefilter.PaginatorDetails, filte
 	}
 
 	return r0, r1
+}
+
+// UpdatePlayer provides a mock function with given fields: id, player
+func (_m *MockRepository) UpdatePlayer(id int64, player *models.Player) error {
+	ret := _m.Called(id, player)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdatePlayer")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int64, *models.Player) error); ok {
+		r0 = rf(id, player)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // NewMockRepository creates a new instance of MockRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

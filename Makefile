@@ -15,3 +15,7 @@ codegen: deps
 deps:
 	go install github.com/charmbracelet/gum@latest
 	go install golang.org/x/tools/cmd/goimports@latest
+models:
+	go generate ./pkg/models
+apis:
+	go generate ./pkg/codegen/...

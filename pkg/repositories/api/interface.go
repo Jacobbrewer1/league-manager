@@ -11,4 +11,10 @@ type Repository interface {
 
 	// CreatePlayer creates a player.
 	CreatePlayer(player *models.Player) error
+
+	// GetPlayer gets a player by ID.
+	GetPlayer(id int64) (*models.Player, error)
+
+	// UpdatePlayer updates a player.
+	UpdatePlayer(id int64, player *models.Player) error
 }

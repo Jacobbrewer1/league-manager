@@ -34,6 +34,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/players_response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
     post:
       tags:
         - players
@@ -52,6 +64,102 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/player'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+
+  /players/{id}:
+    get:
+      tags:
+        - players
+      summary: Get a player by ID
+      operationId: getPlayerByID
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the player
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/player'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+    patch:
+      tags:
+        - players
+      summary: Update a player
+      operationId: updatePlayer
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the player
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/player'
+      responses:
+        '200':
+          description: Player updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/player'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '404':
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
 
 components:
   parameters:
