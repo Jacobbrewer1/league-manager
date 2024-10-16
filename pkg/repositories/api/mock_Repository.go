@@ -14,7 +14,7 @@ type MockRepository struct {
 }
 
 // GetPlayers provides a mock function with given fields: details, filters
-func (_m *MockRepository) GetPlayers(details pagefilter.PaginatorDetails, filters *GetPlayersFilters) (*pagefilter.PaginatedResponse[models.Player], error) {
+func (_m *MockRepository) GetPlayers(details *pagefilter.PaginatorDetails, filters *GetPlayersFilters) (*pagefilter.PaginatedResponse[models.Player], error) {
 	ret := _m.Called(details, filters)
 
 	if len(ret) == 0 {
@@ -23,10 +23,10 @@ func (_m *MockRepository) GetPlayers(details pagefilter.PaginatorDetails, filter
 
 	var r0 *pagefilter.PaginatedResponse[models.Player]
 	var r1 error
-	if rf, ok := ret.Get(0).(func(pagefilter.PaginatorDetails, *GetPlayersFilters) (*pagefilter.PaginatedResponse[models.Player], error)); ok {
+	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetPlayersFilters) (*pagefilter.PaginatedResponse[models.Player], error)); ok {
 		return rf(details, filters)
 	}
-	if rf, ok := ret.Get(0).(func(pagefilter.PaginatorDetails, *GetPlayersFilters) *pagefilter.PaginatedResponse[models.Player]); ok {
+	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetPlayersFilters) *pagefilter.PaginatedResponse[models.Player]); ok {
 		r0 = rf(details, filters)
 	} else {
 		if ret.Get(0) != nil {
@@ -34,7 +34,7 @@ func (_m *MockRepository) GetPlayers(details pagefilter.PaginatorDetails, filter
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(pagefilter.PaginatorDetails, *GetPlayersFilters) error); ok {
+	if rf, ok := ret.Get(1).(func(*pagefilter.PaginatorDetails, *GetPlayersFilters) error); ok {
 		r1 = rf(details, filters)
 	} else {
 		r1 = ret.Error(1)

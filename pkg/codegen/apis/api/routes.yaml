@@ -108,5 +108,13 @@ components:
         id:
           type: integer
           format: int64
-        name:
+        first_name:
           type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        date_of_birth:
+          type: string
+          format: date
