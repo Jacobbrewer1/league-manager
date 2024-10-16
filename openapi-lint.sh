@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if ! command -v gum &> /dev/null; then
-  gum style --foreground 196 "gum is required to generate models. Please install it by running 'go get github.com/jbrewer/gum'"
+  gum style --foreground 196 "gum is required to generate models. Please install it by running 'make deps'"
   exit 1
 fi
 
