@@ -8,4 +8,7 @@ import (
 type Repository interface {
 	// GetPlayers gets a list of players.
 	GetPlayers(details *pagefilter.PaginatorDetails, filters *GetPlayersFilters) (*pagefilter.PaginatedResponse[models.Player], error)
+
+	// CreatePlayer creates a player.
+	CreatePlayer(player *models.Player) error
 }

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/Jacobbrewer1/league-manager/pkg/models"
 	"github.com/Jacobbrewer1/league-manager/pkg/repositories/api/filters"
@@ -14,6 +15,9 @@ import (
 var (
 	// ErrPlayerNotFound is returned when a player is not found
 	ErrPlayerNotFound = errors.New("player not found")
+
+	// ErrDuplicatePlayer is returned when a player already exists
+	ErrDuplicatePlayer = errors.New("player already exists")
 )
 
 func (r *repository) GetPlayers(details *pagefilter.PaginatorDetails, filters *GetPlayersFilters) (*pagefilter.PaginatedResponse[models.Player], error) {
@@ -76,4 +80,24 @@ func (r *repository) getPlayersFilters(got *GetPlayersFilters) pagefilter.Filter
 	}
 
 	return mf
+}
+
+func (r *repository) CreatePlayer(player *models.Player) error {
+	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("create_player"))
+	defer t.ObserveDuration()
+
+	playerByEmail, err := models.PlayerByEmail(r.db, player.Email)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("get player by email: %w", err)
+	} else if playerByEmail != nil || err == nil {
+		return ErrDuplicatePlayer
+	}
+
+	player.UpdatedAt = time.Now().UTC()
+
+	if err := player.InsertWithUpdate(r.db); err != nil {
+		return fmt.Errorf("insert player: %w", err)
+	}
+
+	return nil
 }

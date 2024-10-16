@@ -1,12 +1,17 @@
 #!/bin/bash
 
+if ! command -v gum &> /dev/null; then
+  gum style --foreground 196 "gum is required to generate models. Please install it by running 'go get github.com/jbrewer/gum'"
+  exit 1
+fi
+
 # Check that the IBM OpenAPI Linter is installed
 if ! command -v lint-openapi >/dev/null; then
   echo "Error: IBM OpenAPI Linter is not installed. Please install the linter by following the instructions at https://github.com/IBM/openapi-validator"
   exit 1
 fi
 
-# Find all routes.yaml files in teh ./pkg/codegen/apis directory
+# Find all routes.yaml files in the ./pkg/codegen/apis directory
 routesFiles=$(find ./pkg/codegen/apis -name "routes.yaml")
 
 touch ./pr-report.md
@@ -21,7 +26,7 @@ totalHints=0
 for file in $routesFiles; do
   rm -rf ./lint-output.json
 
-  lint-openapi -c ./openapi-lint-config.yaml -s "$file" >./lint-output.json
+  gum spin "$(lint-openapi -c ./openapi-lint-config.yaml -s "$file" >./lint-output.json)" --spinner dot --title "Linting $file"
 
   # Make ./pkg/codegen/apis/api/routes.yaml -> api/routes.yaml
   prettyName=$(echo $file | sed 's/\.\/pkg\/codegen\/apis\///' | sed 's/\/routes.yaml//')
