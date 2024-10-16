@@ -31,6 +31,24 @@ func (_m *MockRepository) CreatePlayer(player *models.Player) error {
 	return r0
 }
 
+// CreateTeam provides a mock function with given fields: team
+func (_m *MockRepository) CreateTeam(team *models.Team) error {
+	ret := _m.Called(team)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateTeam")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*models.Team) error); ok {
+		r0 = rf(team)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetPlayer provides a mock function with given fields: id
 func (_m *MockRepository) GetPlayer(id int64) (*models.Player, error) {
 	ret := _m.Called(id)
@@ -91,6 +109,66 @@ func (_m *MockRepository) GetPlayers(details *pagefilter.PaginatorDetails, filte
 	return r0, r1
 }
 
+// GetTeam provides a mock function with given fields: id
+func (_m *MockRepository) GetTeam(id int64) (*models.Team, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTeam")
+	}
+
+	var r0 *models.Team
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int64) (*models.Team, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int64) *models.Team); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Team)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetTeams provides a mock function with given fields: details, filters
+func (_m *MockRepository) GetTeams(details *pagefilter.PaginatorDetails, filters *GetTeamsFilters) (*pagefilter.PaginatedResponse[models.Team], error) {
+	ret := _m.Called(details, filters)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTeams")
+	}
+
+	var r0 *pagefilter.PaginatedResponse[models.Team]
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetTeamsFilters) (*pagefilter.PaginatedResponse[models.Team], error)); ok {
+		return rf(details, filters)
+	}
+	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetTeamsFilters) *pagefilter.PaginatedResponse[models.Team]); ok {
+		r0 = rf(details, filters)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*pagefilter.PaginatedResponse[models.Team])
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*pagefilter.PaginatorDetails, *GetTeamsFilters) error); ok {
+		r1 = rf(details, filters)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdatePlayer provides a mock function with given fields: id, player
 func (_m *MockRepository) UpdatePlayer(id int64, player *models.Player) error {
 	ret := _m.Called(id, player)
@@ -102,6 +180,24 @@ func (_m *MockRepository) UpdatePlayer(id int64, player *models.Player) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(int64, *models.Player) error); ok {
 		r0 = rf(id, player)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpdateTeam provides a mock function with given fields: id, team
+func (_m *MockRepository) UpdateTeam(id int64, team *models.Team) error {
+	ret := _m.Called(id, team)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateTeam")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int64, *models.Team) error); ok {
+		r0 = rf(id, team)
 	} else {
 		r0 = ret.Error(0)
 	}

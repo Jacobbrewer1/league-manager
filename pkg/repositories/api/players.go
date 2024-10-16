@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Jacobbrewer1/league-manager/pkg/models"
@@ -95,8 +96,9 @@ func (r *repository) CreatePlayer(player *models.Player) error {
 	}
 
 	player.UpdatedAt = time.Now().UTC()
+	player.Email = strings.ToLower(player.Email)
 
-	if err := player.InsertWithUpdate(r.db); err != nil {
+	if err := player.Insert(r.db); err != nil {
 		return fmt.Errorf("insert player: %w", err)
 	}
 

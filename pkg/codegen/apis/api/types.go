@@ -23,6 +23,20 @@ type PlayersResponse struct {
 	Total   int64    `json:"total"`
 }
 
+// Team defines the model for team.
+type Team struct {
+	ContactEmail *openapi_types.Email `json:"contact_email,omitempty"`
+	ContactPhone *string              `json:"contact_phone,omitempty"`
+	Id           *int64               `json:"id,omitempty"`
+	Name         *string              `json:"name,omitempty"`
+}
+
+// TeamsResponse defines the model for teams_response.
+type TeamsResponse struct {
+	Teams []Team `json:"teams"`
+	Total int64  `json:"total"`
+}
+
 // QueryName defines the model for query_name.
 type QueryName = string
 
@@ -56,6 +70,30 @@ type GetPlayersParams struct {
 // GetPlayersParamsSortDir defines parameters for GetPlayers.
 type GetPlayersParamsSortDir string
 
+// GetTeamsParams defines parameters for GetTeams.
+type GetTeamsParams struct {
+	// Limit Report type
+	Limit *externalRef1.LimitParam `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// LastVal Pagination details, last value of the sort column on the previous page.
+	LastVal *externalRef1.LastValue `form:"last_val,omitempty" json:"last_val,omitempty"`
+
+	// LastId Pagination details, last value of the id column on the previous page.
+	LastId *externalRef1.LastId `form:"last_id,omitempty" json:"last_id,omitempty"`
+
+	// SortBy Pagination details, sort column, if empty uses the id column.
+	SortBy *externalRef1.SortBy `form:"sort_by,omitempty" json:"sort_by,omitempty"`
+
+	// SortDir Pagination details, sorting order.
+	SortDir *GetTeamsParamsSortDir `form:"sort_dir,omitempty" json:"sort_dir,omitempty"`
+
+	// Name The name to filter by
+	Name *QueryName `form:"name,omitempty" json:"name,omitempty"`
+}
+
+// GetTeamsParamsSortDir defines parameters for GetTeams.
+type GetTeamsParamsSortDir string
+
 // CreatePlayerJSONRequestBody defines body for CreatePlayer for application/json ContentType.
 type CreatePlayerJSONRequestBody = Player
 
@@ -67,3 +105,15 @@ type UpdatePlayerJSONRequestBody = Player
 
 // Temporary inclusion of type alias for backwards compatibility
 type UpdatePlayerJSONBody = Player
+
+// CreateTeamJSONRequestBody defines body for CreateTeam for application/json ContentType.
+type CreateTeamJSONRequestBody = Team
+
+// Temporary inclusion of type alias for backwards compatibility
+type CreateTeamJSONBody = Team
+
+// UpdateTeamJSONRequestBody defines body for UpdateTeam for application/json ContentType.
+type UpdateTeamJSONRequestBody = Team
+
+// Temporary inclusion of type alias for backwards compatibility
+type UpdateTeamJSONBody = Team
