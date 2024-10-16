@@ -8,6 +8,34 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Match defines the model for match.
+type Match struct {
+	AwayTeam  *MatchPartnership `json:"away_team,omitempty"`
+	HomeTeam  *MatchPartnership `json:"home_team,omitempty"`
+	Id        *int64            `json:"id,omitempty"`
+	MatchDate *string           `json:"match_date,omitempty"`
+	Season    *Season           `json:"season,omitempty"`
+}
+
+// MatchPartnership defines the model for match_partnership.
+type MatchPartnership struct {
+	Partnership *Partnership `json:"partnership,omitempty"`
+	Scores      *Scores      `json:"scores,omitempty"`
+}
+
+// MatchesResponse defines the model for matches_response.
+type MatchesResponse struct {
+	Matches []Match `json:"matches"`
+	Total   int64   `json:"total"`
+}
+
+// Partnership defines the model for partnership.
+type Partnership struct {
+	PlayerA *Player `json:"player_a,omitempty"`
+	PlayerB *Player `json:"player_b,omitempty"`
+	Team    *Team   `json:"team,omitempty"`
+}
+
 // Player defines the model for player.
 type Player struct {
 	DateOfBirth *openapi_types.Date  `json:"date_of_birth,omitempty"`
@@ -21,6 +49,13 @@ type Player struct {
 type PlayersResponse struct {
 	Players []Player `json:"players"`
 	Total   int64    `json:"total"`
+}
+
+// Scores defines the model for scores.
+type Scores struct {
+	FirstSet  *int64 `json:"first_set,omitempty"`
+	SecondSet *int64 `json:"second_set,omitempty"`
+	ThirdSet  *int64 `json:"third_set,omitempty"`
 }
 
 // Season defines the model for season.
@@ -49,11 +84,62 @@ type TeamsResponse struct {
 	Total int64  `json:"total"`
 }
 
+// QueryDate defines the model for query_date.
+type QueryDate = openapi_types.Date
+
+// QueryDateMax defines the model for query_date_max.
+type QueryDateMax = openapi_types.Date
+
+// QueryDateMin defines the model for query_date_min.
+type QueryDateMin = openapi_types.Date
+
 // QueryName defines the model for query_name.
 type QueryName = string
 
+// QuerySeason defines the model for query_season.
+type QuerySeason = string
+
+// QueryTeam defines the model for query_team.
+type QueryTeam = string
+
 // QueryYear defines the model for query_year.
 type QueryYear = int64
+
+// GetMatchesParams defines parameters for GetMatches.
+type GetMatchesParams struct {
+	// Limit Report type
+	Limit *externalRef1.LimitParam `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// LastVal Pagination details, last value of the sort column on the previous page.
+	LastVal *externalRef1.LastValue `form:"last_val,omitempty" json:"last_val,omitempty"`
+
+	// LastId Pagination details, last value of the id column on the previous page.
+	LastId *externalRef1.LastId `form:"last_id,omitempty" json:"last_id,omitempty"`
+
+	// SortBy Pagination details, sort column, if empty uses the id column.
+	SortBy *externalRef1.SortBy `form:"sort_by,omitempty" json:"sort_by,omitempty"`
+
+	// SortDir Pagination details, sorting order.
+	SortDir *GetMatchesParamsSortDir `form:"sort_dir,omitempty" json:"sort_dir,omitempty"`
+
+	// Date The date to filter by
+	Date *QueryDate `form:"date,omitempty" json:"date,omitempty"`
+
+	// DateMin The minimum date to filter by
+	DateMin *QueryDateMin `form:"date_min,omitempty" json:"date_min,omitempty"`
+
+	// DateMax The maximum date to filter by
+	DateMax *QueryDateMax `form:"date_max,omitempty" json:"date_max,omitempty"`
+
+	// Season The season to filter by
+	Season *QuerySeason `form:"season,omitempty" json:"season,omitempty"`
+
+	// Team The team to filter by
+	Team *QueryTeam `form:"team,omitempty" json:"team,omitempty"`
+}
+
+// GetMatchesParamsSortDir defines parameters for GetMatches.
+type GetMatchesParamsSortDir string
 
 // GetPlayersParams defines parameters for GetPlayers.
 type GetPlayersParams struct {
@@ -129,6 +215,12 @@ type GetTeamsParams struct {
 
 // GetTeamsParamsSortDir defines parameters for GetTeams.
 type GetTeamsParamsSortDir string
+
+// CreateMatchJSONRequestBody defines body for CreateMatch for application/json ContentType.
+type CreateMatchJSONRequestBody = Match
+
+// Temporary inclusion of type alias for backwards compatibility
+type CreateMatchJSONBody = Match
 
 // CreatePlayerJSONRequestBody defines body for CreatePlayer for application/json ContentType.
 type CreatePlayerJSONRequestBody = Player

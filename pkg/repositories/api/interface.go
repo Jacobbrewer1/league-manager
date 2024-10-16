@@ -41,4 +41,7 @@ type Repository interface {
 
 	// UpdateSeason updates a season.
 	UpdateSeason(id int64, season *models.Season) error
+
+	// GetMatches gets a list of matches.
+	GetMatches(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Match], error)
 }

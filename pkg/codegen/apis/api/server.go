@@ -15,6 +15,12 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Get all matches
+	// (GET /matches)
+	GetMatches(w http.ResponseWriter, r *http.Request, params GetMatchesParams)
+	// Create a match
+	// (POST /matches)
+	CreateMatch(w http.ResponseWriter, r *http.Request, body0 *CreateMatchJSONBody)
 	// Get all players
 	// (GET /players)
 	GetPlayers(w http.ResponseWriter, r *http.Request, params GetPlayersParams)
@@ -96,6 +102,142 @@ func WithMetricsMiddleware(middleware MetricsMiddlewareFunc) ServerOption {
 
 // ServerOption represents an optional feature applied to the server.
 type ServerOption func(s *ServerInterfaceWrapper)
+
+// GetMatches operation middleware
+func (siw *ServerInterfaceWrapper) GetMatches(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetMatchesParams
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "last_val" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "last_val", r.URL.Query(), &params.LastVal)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "last_val", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "last_id" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "last_id", r.URL.Query(), &params.LastId)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "last_id", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sort_by" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort_by", r.URL.Query(), &params.SortBy)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "sort_by", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sort_dir" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort_dir", r.URL.Query(), &params.SortDir)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "sort_dir", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "date" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "date", r.URL.Query(), &params.Date)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "date", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "date_min" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "date_min", r.URL.Query(), &params.DateMin)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "date_min", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "date_max" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "date_max", r.URL.Query(), &params.DateMax)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "date_max", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "season" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "season", r.URL.Query(), &params.Season)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "season", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "team" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "team", r.URL.Query(), &params.Team)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "team", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.GetMatches(w, r, params)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
+// CreateMatch operation middleware
+func (siw *ServerInterfaceWrapper) CreateMatch(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	// ------------- Body parameter for CreateMatch for application/json ContentType -------------
+	body := new(CreateMatchJSONRequestBody)
+	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+		siw.errorHandlerFunc(cw, r, &UnmarshalingParamError{ParamName: "body", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.CreateMatch(w, r, body)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
 
 // GetPlayers operation middleware
 func (siw *ServerInterfaceWrapper) GetPlayers(w http.ResponseWriter, r *http.Request) {
@@ -752,6 +894,8 @@ func RegisterUnauthedHandlers(router *mux.Router, si ServerInterface, opts ...Se
 	router.Use(uhttp.AuthHeaderToContextMux())
 	router.Use(uhttp.GenerateOrCopyRequestIDMux())
 
+	router.Methods(http.MethodGet).Path("/matches").Handler(wrapHandler(wrapper.GetMatches))
+	router.Methods(http.MethodPost).Path("/matches").Handler(wrapHandler(wrapper.CreateMatch))
 	router.Methods(http.MethodGet).Path("/players").Handler(wrapHandler(wrapper.GetPlayers))
 	router.Methods(http.MethodPost).Path("/players").Handler(wrapHandler(wrapper.CreatePlayer))
 	router.Methods(http.MethodGet).Path("/players/{id}").Handler(wrapHandler(wrapper.GetPlayerByID))
