@@ -6,6 +6,7 @@ package models
 import (
 	"time"
 
+	"github.com/Jacobbrewer1/goschema/pkg/usql"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -16,6 +17,7 @@ type Match struct {
 	HomePartnersId int       `db:"home_partners_id"`
 	AwayPartnersId int       `db:"away_partners_id"`
 	MatchDate      time.Time `db:"match_date"`
+	WinningTeam    usql.Enum `db:"winning_team"`
 }
 
 // Insert inserts the Match to the database.
@@ -24,13 +26,13 @@ func (m *Match) Insert(db DB) error {
 	defer t.ObserveDuration()
 
 	const sqlstr = "INSERT INTO match (" +
-		"`season_id`, `home_partners_id`, `away_partners_id`, `match_date`" +
+		"`season_id`, `home_partners_id`, `away_partners_id`, `match_date`, `winning_team`" +
 		") VALUES (" +
-		"?, ?, ?, ?" +
+		"?, ?, ?, ?, ?" +
 		")"
 
-	DBLog(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
-	res, err := db.Exec(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
+	DBLog(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.WinningTeam)
+	res, err := db.Exec(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.WinningTeam)
 	if err != nil {
 		return err
 	}
@@ -53,15 +55,15 @@ func InsertManyMatchs(db DB, ms ...*Match) error {
 	defer t.ObserveDuration()
 
 	var sqlstr = "INSERT INTO match (" +
-		"`season_id`,`home_partners_id`,`away_partners_id`,`match_date`" +
+		"`season_id`,`home_partners_id`,`away_partners_id`,`match_date`,`winning_team`" +
 		") VALUES"
 
 	var args []interface{}
 	for _, m := range ms {
 		sqlstr += " (" +
-			"?,?,?,?" +
+			"?,?,?,?,?" +
 			"),"
-		args = append(args, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
+		args = append(args, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.WinningTeam)
 	}
 
 	DBLog(sqlstr, args...)
@@ -93,11 +95,11 @@ func (m *Match) Update(db DB) error {
 	defer t.ObserveDuration()
 
 	const sqlstr = "UPDATE match " +
-		"SET `season_id` = ?, `home_partners_id` = ?, `away_partners_id` = ?, `match_date` = ? " +
+		"SET `season_id` = ?, `home_partners_id` = ?, `away_partners_id` = ?, `match_date` = ?, `winning_team` = ? " +
 		"WHERE `id` = ?"
 
-	DBLog(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.Id)
-	res, err := db.Exec(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.Id)
+	DBLog(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.WinningTeam, m.Id)
+	res, err := db.Exec(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.WinningTeam, m.Id)
 	if err != nil {
 		return err
 	}
@@ -119,14 +121,14 @@ func (m *Match) InsertWithUpdate(db DB) error {
 	defer t.ObserveDuration()
 
 	const sqlstr = "INSERT INTO match (" +
-		"`season_id`, `home_partners_id`, `away_partners_id`, `match_date`" +
+		"`season_id`, `home_partners_id`, `away_partners_id`, `match_date`, `winning_team`" +
 		") VALUES (" +
-		"?, ?, ?, ?" +
+		"?, ?, ?, ?, ?" +
 		") ON DUPLICATE KEY UPDATE " +
-		"`season_id` = VALUES(`season_id`), `home_partners_id` = VALUES(`home_partners_id`), `away_partners_id` = VALUES(`away_partners_id`), `match_date` = VALUES(`match_date`)"
+		"`season_id` = VALUES(`season_id`), `home_partners_id` = VALUES(`home_partners_id`), `away_partners_id` = VALUES(`away_partners_id`), `match_date` = VALUES(`match_date`), `winning_team` = VALUES(`winning_team`)"
 
-	DBLog(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
-	res, err := db.Exec(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
+	DBLog(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.WinningTeam)
+	res, err := db.Exec(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.WinningTeam)
 	if err != nil {
 		return err
 	}
@@ -177,7 +179,7 @@ func MatchById(db DB, id int) (*Match, error) {
 	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Match"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "SELECT `id`, `season_id`, `home_partners_id`, `away_partners_id`, `match_date` " +
+	const sqlstr = "SELECT `id`, `season_id`, `home_partners_id`, `away_partners_id`, `match_date`, `winning_team` " +
 		"FROM match " +
 		"WHERE `id` = ?"
 
@@ -210,3 +212,9 @@ func (m *Match) GetHomePartnersIdPartnership(db DB) (*Partnership, error) {
 func (m *Match) GetAwayPartnersIdPartnership(db DB) (*Partnership, error) {
 	return PartnershipById(db, m.AwayPartnersId)
 }
+
+// Valid values for the 'WinningTeam' enum column
+var (
+	MatchWinningTeamHome = "HOME"
+	MatchWinningTeamAway = "AWAY"
+)

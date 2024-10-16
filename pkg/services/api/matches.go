@@ -54,6 +54,12 @@ func (s *service) GetMatches(w http.ResponseWriter, r *http.Request, params api.
 		respMatch.Id = utils.Ptr(int64(m.Id))
 		respMatch.MatchDate = utils.Ptr(m.MatchDate.Format(time.RFC3339))
 
+		winningTeam := api.WinningTeam_home
+		if string(m.WinningTeam) == models.MatchWinningTeamAway {
+			winningTeam = api.WinningTeam_away
+		}
+		respMatch.WinningTeam = &winningTeam
+
 		season, err := s.r.GetSeason(int64(m.SeasonId))
 		if err != nil {
 			l.Error("Error getting season", slog.String(logging.KeyError, err.Error()))

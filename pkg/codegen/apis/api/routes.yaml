@@ -706,6 +706,8 @@ components:
         match_date:
           type: string
           format: datetime
+        winning_team:
+          $ref: '#/components/schemas/winning_team'
 
     partnership:
       type: object
@@ -737,3 +739,9 @@ components:
         third_set:
           type: integer
           format: int64
+
+    winning_team:
+      type: string
+      enum:
+        - home
+        - away

@@ -5,6 +5,7 @@ create table `match`
     home_partners_id int      not null,
     away_partners_id int      not null,
     match_date       datetime not null,
+    winning_team     enum ('HOME', 'AWAY') not null,
     primary key (id),
     constraint match_season_id_fk
         foreign key (season_id) references season (id),

@@ -10,11 +10,12 @@ import (
 
 // Match defines the model for match.
 type Match struct {
-	AwayTeam  *MatchPartnership `json:"away_team,omitempty"`
-	HomeTeam  *MatchPartnership `json:"home_team,omitempty"`
-	Id        *int64            `json:"id,omitempty"`
-	MatchDate *string           `json:"match_date,omitempty"`
-	Season    *Season           `json:"season,omitempty"`
+	AwayTeam    *MatchPartnership `json:"away_team,omitempty"`
+	HomeTeam    *MatchPartnership `json:"home_team,omitempty"`
+	Id          *int64            `json:"id,omitempty"`
+	MatchDate   *string           `json:"match_date,omitempty"`
+	Season      *Season           `json:"season,omitempty"`
+	WinningTeam *WinningTeam      `json:"winning_team,omitempty"`
 }
 
 // MatchPartnership defines the model for match_partnership.
@@ -83,6 +84,15 @@ type TeamsResponse struct {
 	Teams []Team `json:"teams"`
 	Total int64  `json:"total"`
 }
+
+// WinningTeam defines the model for winning_team.
+type WinningTeam = string
+
+// List of WinningTeam
+const (
+	WinningTeam_away WinningTeam = "away"
+	WinningTeam_home WinningTeam = "home"
+)
 
 // QueryDate defines the model for query_date.
 type QueryDate = openapi_types.Date
