@@ -9,22 +9,22 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// Players represents a row from 'players'.
-type Players struct {
-	Id        int       `db:"id,autoinc,pk"`
-	FirstName string    `db:"first_name"`
-	LastName  string    `db:"last_name"`
-	Email     string    `db:"email"`
-	Dob       time.Time `db:"dob"`
-	UpdatedAt time.Time `db:"updated_at"`
+// players represents a row from 'players'.
+type players struct {
+	id        int       `db:"id,autoinc,pk"`
+	firstName string    `db:"first_name"`
+	lastName  string    `db:"last_name"`
+	email     string    `db:"email"`
+	dob       time.Time `db:"dob"`
+	updatedAt time.Time `db:"updated_at"`
 }
 
-// PlayersColumns is the sorted column names for the type Players
-var PlayersColumns = []string{"Dob", "Email", "FirstName", "Id", "LastName", "UpdatedAt"}
+// playersColumns is the sorted column names for the type players
+var playersColumns = []string{"dob", "email", "firstName", "id", "lastName", "updatedAt"}
 
-// Insert inserts the Players to the database.
-func (m *Players) Insert(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Players"))
+// Insert inserts the players to the database.
+func (m *players) Insert(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_players"))
 	defer t.ObserveDuration()
 
 	const sqlstr = "INSERT INTO players (" +
@@ -33,8 +33,8 @@ func (m *Players) Insert(db DB) error {
 		"?, ?, ?, ?, ?" +
 		")"
 
-	DBLog(sqlstr, m.FirstName, m.LastName, m.Email, m.Dob, m.UpdatedAt)
-	res, err := db.Exec(sqlstr, m.FirstName, m.LastName, m.Email, m.Dob, m.UpdatedAt)
+	DBLog(sqlstr, m.firstName, m.lastName, m.email, m.dob, m.updatedAt)
+	res, err := db.Exec(sqlstr, m.firstName, m.lastName, m.email, m.dob, m.updatedAt)
 	if err != nil {
 		return err
 	}
@@ -44,16 +44,16 @@ func (m *Players) Insert(db DB) error {
 		return err
 	}
 
-	m.Id = int(id)
+	m.id = int(id)
 	return nil
 }
 
-func InsertManyPlayerss(db DB, ms ...*Players) error {
+func InsertManyplayerss(db DB, ms ...*players) error {
 	if len(ms) == 0 {
 		return nil
 	}
 
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_many_Players"))
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_many_players"))
 	defer t.ObserveDuration()
 
 	var sqlstr = "INSERT INTO players (" +
@@ -65,7 +65,7 @@ func InsertManyPlayerss(db DB, ms ...*Players) error {
 		sqlstr += " (" +
 			"?,?,?,?,?" +
 			"),"
-		args = append(args, m.FirstName, m.LastName, m.Email, m.Dob, m.UpdatedAt)
+		args = append(args, m.firstName, m.lastName, m.email, m.dob, m.updatedAt)
 	}
 
 	DBLog(sqlstr, args...)
@@ -80,28 +80,28 @@ func InsertManyPlayerss(db DB, ms ...*Players) error {
 	}
 
 	for i, m := range ms {
-		m.Id = int(id + int64(i))
+		m.id = int(id + int64(i))
 	}
 
 	return nil
 }
 
 // IsPrimaryKeySet returns true if all primary key fields are set to none zero values
-func (m *Players) IsPrimaryKeySet() bool {
-	return IsKeySet(m.Id)
+func (m *players) IsPrimaryKeySet() bool {
+	return IsKeySet(m.id)
 }
 
-// Update updates the Players in the database.
-func (m *Players) Update(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("update_Players"))
+// Update updates the players in the database.
+func (m *players) Update(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("update_players"))
 	defer t.ObserveDuration()
 
 	const sqlstr = "UPDATE players " +
 		"SET `first_name` = ?, `last_name` = ?, `email` = ?, `dob` = ?, `updated_at` = ? " +
 		"WHERE `id` = ?"
 
-	DBLog(sqlstr, m.FirstName, m.LastName, m.Email, m.Dob, m.UpdatedAt, m.Id)
-	res, err := db.Exec(sqlstr, m.FirstName, m.LastName, m.Email, m.Dob, m.UpdatedAt, m.Id)
+	DBLog(sqlstr, m.firstName, m.lastName, m.email, m.dob, m.updatedAt, m.id)
+	res, err := db.Exec(sqlstr, m.firstName, m.lastName, m.email, m.dob, m.updatedAt, m.id)
 	if err != nil {
 		return err
 	}
@@ -116,10 +116,10 @@ func (m *Players) Update(db DB) error {
 	return nil
 }
 
-// InsertWithUpdate inserts the Players to the database, and tries to update
+// InsertWithUpdate inserts the players to the database, and tries to update
 // on unique constraint violations.
-func (m *Players) InsertWithUpdate(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_update_Players"))
+func (m *players) InsertWithUpdate(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_update_players"))
 	defer t.ObserveDuration()
 
 	const sqlstr = "INSERT INTO players (" +
@@ -129,8 +129,8 @@ func (m *Players) InsertWithUpdate(db DB) error {
 		") ON DUPLICATE KEY UPDATE " +
 		"`first_name` = VALUES(`first_name`), `last_name` = VALUES(`last_name`), `email` = VALUES(`email`), `dob` = VALUES(`dob`), `updated_at` = VALUES(`updated_at`)"
 
-	DBLog(sqlstr, m.FirstName, m.LastName, m.Email, m.Dob, m.UpdatedAt)
-	res, err := db.Exec(sqlstr, m.FirstName, m.LastName, m.Email, m.Dob, m.UpdatedAt)
+	DBLog(sqlstr, m.firstName, m.lastName, m.email, m.dob, m.updatedAt)
+	res, err := db.Exec(sqlstr, m.firstName, m.lastName, m.email, m.dob, m.updatedAt)
 	if err != nil {
 		return err
 	}
@@ -140,45 +140,45 @@ func (m *Players) InsertWithUpdate(db DB) error {
 		return err
 	}
 
-	m.Id = int(id)
+	m.id = int(id)
 	return nil
 }
 
-// Save saves the Players to the database.
-func (m *Players) Save(db DB) error {
+// Save saves the players to the database.
+func (m *players) Save(db DB) error {
 	if m.IsPrimaryKeySet() {
 		return m.Update(db)
 	}
 	return m.Insert(db)
 }
 
-// SaveOrUpdate saves the Players to the database, but tries to update
+// SaveOrUpdate saves the players to the database, but tries to update
 // on unique constraint violations.
-func (m *Players) SaveOrUpdate(db DB) error {
+func (m *players) SaveOrUpdate(db DB) error {
 	if m.IsPrimaryKeySet() {
 		return m.Update(db)
 	}
 	return m.InsertWithUpdate(db)
 }
 
-// Delete deletes the Players from the database.
-func (m *Players) Delete(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("delete_Players"))
+// Delete deletes the players from the database.
+func (m *players) Delete(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("delete_players"))
 	defer t.ObserveDuration()
 
 	const sqlstr = "DELETE FROM players WHERE `id` = ?"
 
-	DBLog(sqlstr, m.Id)
-	_, err := db.Exec(sqlstr, m.Id)
+	DBLog(sqlstr, m.id)
+	_, err := db.Exec(sqlstr, m.id)
 
 	return err
 }
 
-// PlayersById retrieves a row from 'players' as a Players.
+// playersByid retrieves a row from 'players' as a players.
 //
 // Generated from primary key.
-func PlayersById(db DB, id int) (*Players, error) {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Players"))
+func playersByid(db DB, id int) (*players, error) {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_players"))
 	defer t.ObserveDuration()
 
 	const sqlstr = "SELECT `id`, `first_name`, `last_name`, `email`, `dob`, `updated_at` " +
@@ -186,7 +186,7 @@ func PlayersById(db DB, id int) (*Players, error) {
 		"WHERE `id` = ?"
 
 	DBLog(sqlstr, id)
-	var m Players
+	var m players
 	if err := db.Get(&m, sqlstr, id); err != nil {
 		return nil, err
 	}
@@ -194,11 +194,11 @@ func PlayersById(db DB, id int) (*Players, error) {
 	return &m, nil
 }
 
-// PlayersByEmail retrieves a row from 'players' as a *Players.
+// playersByemail retrieves a row from 'players' as a *players.
 //
 // Generated from index 'players_email_uindex' of type 'unique'.
-func PlayersByEmail(db DB, email string) (*Players, error) {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Players"))
+func playersByemail(db DB, email string) (*players, error) {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_players"))
 	defer t.ObserveDuration()
 
 	const sqlstr = "SELECT `id`, `first_name`, `last_name`, `email`, `dob`, `updated_at` " +
@@ -206,7 +206,7 @@ func PlayersByEmail(db DB, email string) (*Players, error) {
 		"WHERE `email` = ?"
 
 	DBLog(sqlstr, email)
-	var m Players
+	var m players
 	if err := db.Get(&m, sqlstr, email); err != nil {
 		return nil, err
 	}

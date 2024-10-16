@@ -15,6 +15,14 @@ if ! command -v goimports &> /dev/null; then
   exit 1
 fi
 
+# If the "--all" flag is passed, generate all models
+if [ "$1" == "--all" ]; then
+  gum spin "$(goschema generate --templates=./templates/*tmpl --out=./ --sql=./schemas/*.sql)" --spinner dot --title "Generating all models"
+  go fmt ./*.go
+  goimports -w ./*.go
+  exit 0
+fi
+
 # Allow the user too select the model/s to generate
 schemas=$(find ./schemas -type f -name "*.sql" | sed 's/\.\/schemas\///' | sed 's/\.sql//')
 
