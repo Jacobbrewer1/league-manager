@@ -15,11 +15,42 @@ if ! command -v goimports &> /dev/null; then
   exit 1
 fi
 
-# If the "--all" flag is passed, generate all models
-if [ "$1" == "--all" ]; then
-  gum spin --spinner dot --title "Generating all models" -- goschema generate --templates=./templates/*tmpl --out=./ --sql=./schemas/*.sql
-  go fmt ./*.go
-  goimports -w ./*.go
+all=false
+clean=false
+forced=false
+
+# Get the flags passed to the script and set the variables accordingly
+while getopts "acf" flag; do
+  case $flag in
+    a)
+      all=true
+      ;;
+    c)
+      clean=true
+      ;;
+    f)
+      forced=true
+      ;;
+    *)
+      gum style --foreground 196 "Invalid flag $flag"
+      exit 1
+      ;;
+  esac
+done
+
+# If the -c flag is passed, remove all generated models
+if [ "$clean" = true ]; then
+  if [ "$forced" = false ]; then
+    gum style "Are you sure you want to remove all generated models?"
+    gum confirm || exit 0
+  fi
+fi
+
+# If the -a flag is passed, generate all models
+if [ "$all" = true ]; then
+  gum spin --spinner dot --title "Generating all models" -- goschema generate --templates=./templates/*tmpl --out=./ --sql=./schemas/*.sql --extension=xo
+  go fmt ./*.xo.go
+  goimports -w ./*.xo.go
   exit 0
 fi
 
@@ -34,10 +65,12 @@ for model in $togen; do
   gum style --foreground 222 "  - $model"
 done
 
-gum confirm || exit 0
+if [ "$forced" = false ]; then
+  gum confirm || exit 0
+fi
 
 for model in $togen; do
-  gum spin "$(goschema generate --templates=./templates/*tmpl --out=./ --sql=./schemas/"$model".sql)" --spinner dot --title "Generating model $model"
-  go fmt ./"$model".go
-  goimports -w ./"$model".go
+  gum spin --spinner dot --title "Generating model $model" -- goschema generate --templates=./templates/*tmpl --out=./ --sql=./schemas/"$model".sql --extension=xo
+  go fmt ./"$model".xo.go
+  goimports -w ./"$model".xo.go
 done
