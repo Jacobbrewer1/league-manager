@@ -9,11 +9,11 @@ subtitle = "Release Changes"
 # specify the style of commit links to generate, defaults to "github" if omitted
 link-style = "github"
 
-# This sets an output file only! If it exists already, new changelog api will be
+# This sets an output file only! If it exists already, new changelog data will be
 # prepended, if not it will be created.
 #
 # This is useful in conjunction with the infile field if you have a separate file
-# that you would like to append after newly created clog api
+# that you would like to append after newly created clog data
 #
 # Defaults to stdout when omitted
 outfile = "changelog.md"
