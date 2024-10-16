@@ -41,4 +41,13 @@ type Repository interface {
 
 	// UpdateSeason updates a season.
 	UpdateSeason(id int64, season *models.Season) error
+
+	// GetMatches gets a list of matches.
+	GetMatches(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Match], error)
+
+	// GetPartnership gets a partnership by ID.
+	GetPartnership(id int64) (*models.Partnership, error)
+
+	// GetScoreByMatchAndPartnership gets a score by match and partnership.
+	GetScoreByMatchAndPartnership(matchID, partnershipID int64) (*models.Score, error)
 }

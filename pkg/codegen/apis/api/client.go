@@ -90,6 +90,14 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// GetMatches request
+	GetMatches(ctx context.Context, params *GetMatchesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateMatchWithBody request with any body
+	CreateMatchWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateMatch(ctx context.Context, body CreateMatchJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetPlayers request
 	GetPlayers(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -137,6 +145,42 @@ type ClientInterface interface {
 	UpdateTeamWithBody(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateTeam(ctx context.Context, id int64, body UpdateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) GetMatches(ctx context.Context, params *GetMatchesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetMatchesRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateMatchWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateMatchRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateMatch(ctx context.Context, body CreateMatchJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateMatchRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) GetPlayers(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -353,6 +397,239 @@ func (c *Client) UpdateTeam(ctx context.Context, id int64, body UpdateTeamJSONRe
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewGetMatchesRequest generates requests for GetMatches
+func NewGetMatchesRequest(server string, params *GetMatchesParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/matches")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LastVal != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "last_val", runtime.ParamLocationQuery, *params.LastVal); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LastId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "last_id", runtime.ParamLocationQuery, *params.LastId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort_by", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortDir != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort_dir", runtime.ParamLocationQuery, *params.SortDir); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Date != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "date", runtime.ParamLocationQuery, *params.Date); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.DateMin != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "date_min", runtime.ParamLocationQuery, *params.DateMin); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.DateMax != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "date_max", runtime.ParamLocationQuery, *params.DateMax); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Season != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "season", runtime.ParamLocationQuery, *params.Season); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Team != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "team", runtime.ParamLocationQuery, *params.Team); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateMatchRequest calls the generic CreateMatch builder with application/json body
+func NewCreateMatchRequest(server string, body CreateMatchJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateMatchRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateMatchRequestWithBody generates requests for CreateMatch with any type of body
+func NewCreateMatchRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/matches")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
 }
 
 // NewGetPlayersRequest generates requests for GetPlayers
@@ -1164,6 +1441,14 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// GetMatchesWithResponse request
+	GetMatchesWithResponse(ctx context.Context, params *GetMatchesParams, reqEditors ...RequestEditorFn) (*GetMatchesResponse, error)
+
+	// CreateMatchWithBodyWithResponse request with any body
+	CreateMatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateMatchResponse, error)
+
+	CreateMatchWithResponse(ctx context.Context, body CreateMatchJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateMatchResponse, error)
+
 	// GetPlayersWithResponse request
 	GetPlayersWithResponse(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*GetPlayersResponse, error)
 
@@ -1211,6 +1496,54 @@ type ClientWithResponsesInterface interface {
 	UpdateTeamWithBodyWithResponse(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateTeamResponse, error)
 
 	UpdateTeamWithResponse(ctx context.Context, id int64, body UpdateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTeamResponse, error)
+}
+
+type GetMatchesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *MatchesResponse
+	JSON400      *externalRef0.ErrorMessage
+	JSON500      *externalRef0.ErrorMessage
+}
+
+// Status returns HTTPResponse.Status
+func (r GetMatchesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetMatchesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateMatchResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *Match
+	JSON400      *externalRef0.ErrorMessage
+	JSON500      *externalRef0.ErrorMessage
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateMatchResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateMatchResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type GetPlayersResponse struct {
@@ -1507,6 +1840,32 @@ func (r UpdateTeamResponse) StatusCode() int {
 	return 0
 }
 
+// GetMatchesWithResponse request returning *GetMatchesResponse
+func (c *ClientWithResponses) GetMatchesWithResponse(ctx context.Context, params *GetMatchesParams, reqEditors ...RequestEditorFn) (*GetMatchesResponse, error) {
+	rsp, err := c.GetMatches(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetMatchesResponse(rsp)
+}
+
+// CreateMatchWithBodyWithResponse request with arbitrary body returning *CreateMatchResponse
+func (c *ClientWithResponses) CreateMatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateMatchResponse, error) {
+	rsp, err := c.CreateMatchWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateMatchResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateMatchWithResponse(ctx context.Context, body CreateMatchJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateMatchResponse, error) {
+	rsp, err := c.CreateMatch(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateMatchResponse(rsp)
+}
+
 // GetPlayersWithResponse request returning *GetPlayersResponse
 func (c *ClientWithResponses) GetPlayersWithResponse(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*GetPlayersResponse, error) {
 	rsp, err := c.GetPlayers(ctx, params, reqEditors...)
@@ -1661,6 +2020,86 @@ func (c *ClientWithResponses) UpdateTeamWithResponse(ctx context.Context, id int
 		return nil, err
 	}
 	return ParseUpdateTeamResponse(rsp)
+}
+
+// ParseGetMatchesResponse parses an HTTP response from a GetMatchesWithResponse call
+func ParseGetMatchesResponse(rsp *http.Response) (*GetMatchesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetMatchesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest MatchesResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateMatchResponse parses an HTTP response from a CreateMatchWithResponse call
+func ParseCreateMatchResponse(rsp *http.Response) (*CreateMatchResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateMatchResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest Match
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseGetPlayersResponse parses an HTTP response from a GetPlayersWithResponse call
