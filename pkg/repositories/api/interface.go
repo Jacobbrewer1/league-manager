@@ -20,4 +20,7 @@ type Repository interface {
 
 	// GetTeams gets a list of teams.
 	GetTeams(details *pagefilter.PaginatorDetails, filters *GetTeamsFilters) (*pagefilter.PaginatedResponse[models.Team], error)
+
+	// CreateTeam creates a team.
+	CreateTeam(team *models.Team) error
 }

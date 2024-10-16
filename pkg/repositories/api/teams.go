@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/Jacobbrewer1/league-manager/pkg/models"
 	"github.com/Jacobbrewer1/league-manager/pkg/repositories/api/filters"
@@ -14,6 +16,9 @@ import (
 var (
 	// ErrTeamNotFound is returned when a team is not found
 	ErrTeamNotFound = errors.New("team not found")
+
+	// ErrDuplicateTeam is returned when a team already exists
+	ErrDuplicateTeam = errors.New("team already exists")
 )
 
 func (r *repository) GetTeams(details *pagefilter.PaginatorDetails, filters *GetTeamsFilters) (*pagefilter.PaginatedResponse[models.Team], error) {
@@ -76,4 +81,25 @@ func (r *repository) getTeamsFilters(got *GetTeamsFilters) *pagefilter.MultiFilt
 	}
 
 	return mf
+}
+
+func (r *repository) CreateTeam(team *models.Team) error {
+	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("create_team"))
+	defer t.ObserveDuration()
+
+	teamByName, err := models.TeamByName(r.db, team.Name)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("get team by name: %w", err)
+	} else if teamByName != nil || err == nil {
+		return ErrDuplicateTeam
+	}
+
+	team.ContactEmail = strings.ToLower(team.ContactEmail)
+	team.UpdatedAt = time.Now().UTC()
+
+	if err := team.Insert(r.db); err != nil {
+		return fmt.Errorf("insert team: %w", err)
+	}
+
+	return nil
 }

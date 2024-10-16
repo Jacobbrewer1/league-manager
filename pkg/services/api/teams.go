@@ -92,6 +92,59 @@ func (s *service) getTeamsFilters(
 }
 
 func (s *service) CreateTeam(w http.ResponseWriter, r *http.Request, body0 *api.CreateTeamJSONBody) {
-	//TODO implement me
-	panic("implement me")
+	l := logging.LoggerFromRequest(r)
+
+	if err := s.validateTeam(body0); err != nil {
+		l.Error("Failed to validate team", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusBadRequest, "failed to validate team", err)
+		return
+	}
+
+	team := mapAPITeamToModel(body0)
+	err := s.r.CreateTeam(team)
+	if err != nil {
+		l.Error("Failed to create team", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to create team", err)
+		return
+	}
+
+	resp := modelAsApiTeam(team)
+	if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
+		l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
+		return
+	}
+}
+
+func mapAPITeamToModel(team *api.CreateTeamJSONBody) *models.Team {
+	t := new(models.Team)
+
+	if team.ContactEmail != nil {
+		t.ContactEmail = string(*team.ContactEmail)
+	}
+
+	if team.ContactPhone != nil {
+		t.ContactMobile = *team.ContactPhone
+	}
+
+	if team.Name != nil {
+		t.Name = *team.Name
+	}
+
+	return t
+}
+
+func (s *service) validateTeam(body0 *api.CreateTeamJSONBody) error {
+	if body0 == nil {
+		return errors.New("body is nil")
+	}
+
+	if body0.Name == nil {
+		return errors.New("name is nil")
+	}
+
+	if *body0.Name == "" {
+		return errors.New("name is empty")
+	}
+
+	return nil
 }

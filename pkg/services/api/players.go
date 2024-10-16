@@ -111,7 +111,6 @@ func (s *service) CreatePlayer(w http.ResponseWriter, r *http.Request, body0 *ap
 	}
 
 	resp := modelAsApiPlayer(p)
-
 	if err := uhttp.Encode(w, http.StatusCreated, resp); err != nil {
 		l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
 		return
@@ -119,6 +118,10 @@ func (s *service) CreatePlayer(w http.ResponseWriter, r *http.Request, body0 *ap
 }
 
 func (s *service) validatePlayer(player *api.Player) error {
+	if player == nil {
+		return errors.New("player is nil")
+	}
+
 	if player.FirstName == nil || *player.FirstName == "" {
 		return errors.New("first name is required")
 	}
