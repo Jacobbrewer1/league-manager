@@ -76,7 +76,8 @@ func (r *repository) getPlayersFilters(got *GetPlayersFilters) pagefilter.Filter
 	}
 
 	if got.Name != "" {
-		mf.Add(filters.NewNameLike(got.Name))
+		mf.Add(filters.NewFirstnameLike(got.Name))
+		mf.Add(filters.NewLastnameLike(got.Name))
 	}
 
 	return mf
