@@ -4,7 +4,7 @@
 package api
 
 import (
-	externalRef0 "github.com/Jacobbrewer1/pagefilter/common"
+	externalRef1 "github.com/Jacobbrewer1/pagefilter/common"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
@@ -32,16 +32,16 @@ type QueryYear = int64
 // GetPlayersParams defines parameters for GetPlayers.
 type GetPlayersParams struct {
 	// Limit Report type
-	Limit *externalRef0.LimitParam `form:"limit,omitempty" json:"limit,omitempty"`
+	Limit *externalRef1.LimitParam `form:"limit,omitempty" json:"limit,omitempty"`
 
 	// LastVal Pagination details, last value of the sort column on the previous page.
-	LastVal *externalRef0.LastValue `form:"last_val,omitempty" json:"last_val,omitempty"`
+	LastVal *externalRef1.LastValue `form:"last_val,omitempty" json:"last_val,omitempty"`
 
 	// LastId Pagination details, last value of the id column on the previous page.
-	LastId *externalRef0.LastId `form:"last_id,omitempty" json:"last_id,omitempty"`
+	LastId *externalRef1.LastId `form:"last_id,omitempty" json:"last_id,omitempty"`
 
 	// SortBy Pagination details, sort column, if empty uses the id column.
-	SortBy *externalRef0.SortBy `form:"sort_by,omitempty" json:"sort_by,omitempty"`
+	SortBy *externalRef1.SortBy `form:"sort_by,omitempty" json:"sort_by,omitempty"`
 
 	// SortDir Pagination details, sorting order.
 	SortDir *GetPlayersParamsSortDir `form:"sort_dir,omitempty" json:"sort_dir,omitempty"`
@@ -61,3 +61,9 @@ type CreatePlayerJSONRequestBody = Player
 
 // Temporary inclusion of type alias for backwards compatibility
 type CreatePlayerJSONBody = Player
+
+// UpdatePlayerJSONRequestBody defines body for UpdatePlayer for application/json ContentType.
+type UpdatePlayerJSONRequestBody = Player
+
+// Temporary inclusion of type alias for backwards compatibility
+type UpdatePlayerJSONBody = Player

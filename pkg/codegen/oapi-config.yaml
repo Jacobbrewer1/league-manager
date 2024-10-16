@@ -1,2 +1,3 @@
 import-mapping:
   "../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml": "github.com/Jacobbrewer1/pagefilter/common"
+  "../common/common.yaml": "github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/common"
