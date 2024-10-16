@@ -105,9 +105,16 @@ func (s *service) CreatePlayer(w http.ResponseWriter, r *http.Request, body0 *ap
 	p := mapAPIPlayerToModel(body0)
 
 	if err := s.r.CreatePlayer(p); err != nil {
-		l.Error("Failed to create player", slog.String(logging.KeyError, err.Error()))
-		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to create player", err)
-		return
+		switch {
+		case errors.Is(err, repo.ErrDuplicatePlayer):
+			l.Error("Player already exists", slog.String(logging.KeyError, err.Error()))
+			uhttp.SendErrorMessageWithStatus(w, http.StatusConflict, "player already exists", err)
+			return
+		default:
+			l.Error("Error creating player", slog.String(logging.KeyError, err.Error()))
+			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error creating player", err)
+			return
+		}
 	}
 
 	resp := modelAsApiPlayer(p)
@@ -179,7 +186,6 @@ func (s *service) GetPlayerByID(w http.ResponseWriter, r *http.Request, id int64
 	}
 
 	resp := modelAsApiPlayer(player)
-
 	if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
 		l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
 		return

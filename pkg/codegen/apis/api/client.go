@@ -106,6 +106,22 @@ type ClientInterface interface {
 
 	UpdatePlayer(ctx context.Context, id int64, body UpdatePlayerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetSeasons request
+	GetSeasons(ctx context.Context, params *GetSeasonsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateSeasonWithBody request with any body
+	CreateSeasonWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateSeason(ctx context.Context, body CreateSeasonJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSeasonByID request
+	GetSeasonByID(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateSeasonWithBody request with any body
+	UpdateSeasonWithBody(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateSeason(ctx context.Context, id int64, body UpdateSeasonJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetTeams request
 	GetTeams(ctx context.Context, params *GetTeamsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -185,6 +201,78 @@ func (c *Client) UpdatePlayerWithBody(ctx context.Context, id int64, contentType
 
 func (c *Client) UpdatePlayer(ctx context.Context, id int64, body UpdatePlayerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdatePlayerRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSeasons(ctx context.Context, params *GetSeasonsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSeasonsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSeasonWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSeasonRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSeason(ctx context.Context, body CreateSeasonJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSeasonRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSeasonByID(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSeasonByIDRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateSeasonWithBody(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateSeasonRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateSeason(ctx context.Context, id int64, body UpdateSeasonJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateSeasonRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -533,6 +621,256 @@ func NewUpdatePlayerRequestWithBody(server string, id int64, contentType string,
 	return req, nil
 }
 
+// NewGetSeasonsRequest generates requests for GetSeasons
+func NewGetSeasonsRequest(server string, params *GetSeasonsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/seasons")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LastVal != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "last_val", runtime.ParamLocationQuery, *params.LastVal); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LastId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "last_id", runtime.ParamLocationQuery, *params.LastId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort_by", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortDir != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort_dir", runtime.ParamLocationQuery, *params.SortDir); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Name != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "name", runtime.ParamLocationQuery, *params.Name); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateSeasonRequest calls the generic CreateSeason builder with application/json body
+func NewCreateSeasonRequest(server string, body CreateSeasonJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateSeasonRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateSeasonRequestWithBody generates requests for CreateSeason with any type of body
+func NewCreateSeasonRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/seasons")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetSeasonByIDRequest generates requests for GetSeasonByID
+func NewGetSeasonByIDRequest(server string, id int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/seasons/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateSeasonRequest calls the generic UpdateSeason builder with application/json body
+func NewUpdateSeasonRequest(server string, id int64, body UpdateSeasonJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateSeasonRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewUpdateSeasonRequestWithBody generates requests for UpdateSeason with any type of body
+func NewUpdateSeasonRequestWithBody(server string, id int64, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/seasons/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewGetTeamsRequest generates requests for GetTeams
 func NewGetTeamsRequest(server string, params *GetTeamsParams) (*http.Request, error) {
 	var err error
@@ -842,6 +1180,22 @@ type ClientWithResponsesInterface interface {
 
 	UpdatePlayerWithResponse(ctx context.Context, id int64, body UpdatePlayerJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdatePlayerResponse, error)
 
+	// GetSeasonsWithResponse request
+	GetSeasonsWithResponse(ctx context.Context, params *GetSeasonsParams, reqEditors ...RequestEditorFn) (*GetSeasonsResponse, error)
+
+	// CreateSeasonWithBodyWithResponse request with any body
+	CreateSeasonWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSeasonResponse, error)
+
+	CreateSeasonWithResponse(ctx context.Context, body CreateSeasonJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSeasonResponse, error)
+
+	// GetSeasonByIDWithResponse request
+	GetSeasonByIDWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*GetSeasonByIDResponse, error)
+
+	// UpdateSeasonWithBodyWithResponse request with any body
+	UpdateSeasonWithBodyWithResponse(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSeasonResponse, error)
+
+	UpdateSeasonWithResponse(ctx context.Context, id int64, body UpdateSeasonJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSeasonResponse, error)
+
 	// GetTeamsWithResponse request
 	GetTeamsWithResponse(ctx context.Context, params *GetTeamsParams, reqEditors ...RequestEditorFn) (*GetTeamsResponse, error)
 
@@ -951,6 +1305,104 @@ func (r UpdatePlayerResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdatePlayerResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSeasonsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *SeasonsResponse
+	JSON400      *externalRef0.ErrorMessage
+	JSON500      *externalRef0.ErrorMessage
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSeasonsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSeasonsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateSeasonResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *Season
+	JSON400      *externalRef0.ErrorMessage
+	JSON500      *externalRef0.ErrorMessage
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateSeasonResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateSeasonResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSeasonByIDResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Season
+	JSON400      *externalRef0.ErrorMessage
+	JSON404      *externalRef0.ErrorMessage
+	JSON500      *externalRef0.ErrorMessage
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSeasonByIDResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSeasonByIDResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateSeasonResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Season
+	JSON400      *externalRef0.ErrorMessage
+	JSON404      *externalRef0.ErrorMessage
+	JSON500      *externalRef0.ErrorMessage
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateSeasonResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateSeasonResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1105,6 +1557,58 @@ func (c *ClientWithResponses) UpdatePlayerWithResponse(ctx context.Context, id i
 		return nil, err
 	}
 	return ParseUpdatePlayerResponse(rsp)
+}
+
+// GetSeasonsWithResponse request returning *GetSeasonsResponse
+func (c *ClientWithResponses) GetSeasonsWithResponse(ctx context.Context, params *GetSeasonsParams, reqEditors ...RequestEditorFn) (*GetSeasonsResponse, error) {
+	rsp, err := c.GetSeasons(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSeasonsResponse(rsp)
+}
+
+// CreateSeasonWithBodyWithResponse request with arbitrary body returning *CreateSeasonResponse
+func (c *ClientWithResponses) CreateSeasonWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSeasonResponse, error) {
+	rsp, err := c.CreateSeasonWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSeasonResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateSeasonWithResponse(ctx context.Context, body CreateSeasonJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSeasonResponse, error) {
+	rsp, err := c.CreateSeason(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSeasonResponse(rsp)
+}
+
+// GetSeasonByIDWithResponse request returning *GetSeasonByIDResponse
+func (c *ClientWithResponses) GetSeasonByIDWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*GetSeasonByIDResponse, error) {
+	rsp, err := c.GetSeasonByID(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSeasonByIDResponse(rsp)
+}
+
+// UpdateSeasonWithBodyWithResponse request with arbitrary body returning *UpdateSeasonResponse
+func (c *ClientWithResponses) UpdateSeasonWithBodyWithResponse(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSeasonResponse, error) {
+	rsp, err := c.UpdateSeasonWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateSeasonResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateSeasonWithResponse(ctx context.Context, id int64, body UpdateSeasonJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSeasonResponse, error) {
+	rsp, err := c.UpdateSeason(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateSeasonResponse(rsp)
 }
 
 // GetTeamsWithResponse request returning *GetTeamsResponse
@@ -1302,6 +1806,180 @@ func ParseUpdatePlayerResponse(rsp *http.Response) (*UpdatePlayerResponse, error
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest Player
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSeasonsResponse parses an HTTP response from a GetSeasonsWithResponse call
+func ParseGetSeasonsResponse(rsp *http.Response) (*GetSeasonsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSeasonsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SeasonsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateSeasonResponse parses an HTTP response from a CreateSeasonWithResponse call
+func ParseCreateSeasonResponse(rsp *http.Response) (*CreateSeasonResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateSeasonResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest Season
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSeasonByIDResponse parses an HTTP response from a GetSeasonByIDWithResponse call
+func ParseGetSeasonByIDResponse(rsp *http.Response) (*GetSeasonByIDResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSeasonByIDResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Season
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest externalRef0.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateSeasonResponse parses an HTTP response from a UpdateSeasonWithResponse call
+func ParseUpdateSeasonResponse(rsp *http.Response) (*UpdateSeasonResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateSeasonResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Season
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

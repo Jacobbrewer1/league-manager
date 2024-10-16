@@ -308,6 +308,153 @@ paths:
               schema:
                 $ref: '../common/common.yaml#/components/schemas/error_message'
 
+  /seasons:
+    get:
+      tags:
+        - seasons
+      summary: Get all seasons
+      operationId: getSeasons
+      parameters:
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/limit_param'
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/last_value'
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/last_id'
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/sort_by'
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/sort_direction'
+        - $ref: '#/components/parameters/query_name'
+      responses:
+        '200':
+          description: A list of seasons
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/seasons_response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+    post:
+      tags:
+        - seasons
+      summary: Create a season
+      operationId: createSeason
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/season'
+      responses:
+        '201':
+          description: Season created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/season'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+
+  /seasons/{id}:
+    get:
+      tags:
+        - seasons
+      summary: Get a season by ID
+      operationId: getSeasonByID
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the season
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A season
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/season'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '404':
+          description: Season not found
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+    patch:
+      tags:
+        - seasons
+      summary: Update a season
+      operationId: updateSeason
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the season
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/season'
+      responses:
+        '200':
+          description: Season updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/season'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '404':
+          description: Season not found
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+
 components:
   parameters:
     query_year:
@@ -400,4 +547,27 @@ components:
           type: string
           format: email
         contact_phone:
+          type: string
+
+    seasons_response:
+      type: object
+      required:
+        - seasons
+        - total
+      properties:
+        seasons:
+          type: array
+          items:
+            $ref: '#/components/schemas/season'
+        total:
+          type: integer
+          format: int64
+
+    season:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
           type: string

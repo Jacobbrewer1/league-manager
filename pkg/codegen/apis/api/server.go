@@ -27,6 +27,18 @@ type ServerInterface interface {
 	// Update a player
 	// (PATCH /players/{id})
 	UpdatePlayer(w http.ResponseWriter, r *http.Request, id int64, body0 *UpdatePlayerJSONBody)
+	// Get all seasons
+	// (GET /seasons)
+	GetSeasons(w http.ResponseWriter, r *http.Request, params GetSeasonsParams)
+	// Create a season
+	// (POST /seasons)
+	CreateSeason(w http.ResponseWriter, r *http.Request, body0 *CreateSeasonJSONBody)
+	// Get a season by ID
+	// (GET /seasons/{id})
+	GetSeasonByID(w http.ResponseWriter, r *http.Request, id int64)
+	// Update a season
+	// (PATCH /seasons/{id})
+	UpdateSeason(w http.ResponseWriter, r *http.Request, id int64, body0 *UpdateSeasonJSONBody)
 	// Get all teams
 	// (GET /teams)
 	GetTeams(w http.ResponseWriter, r *http.Request, params GetTeamsParams)
@@ -265,6 +277,183 @@ func (siw *ServerInterfaceWrapper) UpdatePlayer(w http.ResponseWriter, r *http.R
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.handler.UpdatePlayer(w, r, id, body)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
+// GetSeasons operation middleware
+func (siw *ServerInterfaceWrapper) GetSeasons(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetSeasonsParams
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "last_val" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "last_val", r.URL.Query(), &params.LastVal)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "last_val", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "last_id" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "last_id", r.URL.Query(), &params.LastId)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "last_id", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sort_by" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort_by", r.URL.Query(), &params.SortBy)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "sort_by", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sort_dir" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort_dir", r.URL.Query(), &params.SortDir)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "sort_dir", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "name" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "name", r.URL.Query(), &params.Name)
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.GetSeasons(w, r, params)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
+// CreateSeason operation middleware
+func (siw *ServerInterfaceWrapper) CreateSeason(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	// ------------- Body parameter for CreateSeason for application/json ContentType -------------
+	body := new(CreateSeasonJSONRequestBody)
+	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+		siw.errorHandlerFunc(cw, r, &UnmarshalingParamError{ParamName: "body", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.CreateSeason(w, r, body)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
+// GetSeasonByID operation middleware
+func (siw *ServerInterfaceWrapper) GetSeasonByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", mux.Vars(r)["id"], &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.GetSeasonByID(w, r, id)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
+// UpdateSeason operation middleware
+func (siw *ServerInterfaceWrapper) UpdateSeason(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", mux.Vars(r)["id"], &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Body parameter for UpdateSeason for application/json ContentType -------------
+	body := new(UpdateSeasonJSONRequestBody)
+	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+		siw.errorHandlerFunc(cw, r, &UnmarshalingParamError{ParamName: "body", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.UpdateSeason(w, r, id, body)
 	}))
 
 	handler.ServeHTTP(cw, r.WithContext(ctx))
@@ -567,6 +756,10 @@ func RegisterUnauthedHandlers(router *mux.Router, si ServerInterface, opts ...Se
 	router.Methods(http.MethodPost).Path("/players").Handler(wrapHandler(wrapper.CreatePlayer))
 	router.Methods(http.MethodGet).Path("/players/{id}").Handler(wrapHandler(wrapper.GetPlayerByID))
 	router.Methods(http.MethodPatch).Path("/players/{id}").Handler(wrapHandler(wrapper.UpdatePlayer))
+	router.Methods(http.MethodGet).Path("/seasons").Handler(wrapHandler(wrapper.GetSeasons))
+	router.Methods(http.MethodPost).Path("/seasons").Handler(wrapHandler(wrapper.CreateSeason))
+	router.Methods(http.MethodGet).Path("/seasons/{id}").Handler(wrapHandler(wrapper.GetSeasonByID))
+	router.Methods(http.MethodPatch).Path("/seasons/{id}").Handler(wrapHandler(wrapper.UpdateSeason))
 	router.Methods(http.MethodGet).Path("/teams").Handler(wrapHandler(wrapper.GetTeams))
 	router.Methods(http.MethodPost).Path("/teams").Handler(wrapHandler(wrapper.CreateTeam))
 	router.Methods(http.MethodGet).Path("/teams/{id}").Handler(wrapHandler(wrapper.GetTeamByID))
