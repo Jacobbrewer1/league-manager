@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	usql "github.com/Jacobbrewer1/league-manager/pkg/utils/sql"
+	"github.com/Jacobbrewer1/goschema/usql"
 	"github.com/prometheus/client_golang/prometheus"
 )
 {{ with .Table }}
@@ -21,13 +21,6 @@ type {{ $struct }} struct {
 	{{ range $column := .Columns -}}
 	{{ .Name | structify }} {{ template "type" $column }} {{ template "tags" $column }} {{ if .Comment }}// {{ .Comment }}{{ end }}
 	{{ end -}}
-}
-
-// {{ $struct }}Columns is the sorted column names for the type {{ $struct }}
-var {{ $struct }}Columns = []string{
-	{{- range $i, $column := sorted_columns . -}}
-		{{ if $i }}, {{ end }}"{{ $column.Name | structify }}"
-	{{- end -}}
 }
 
 {{ template "insert" . }}

@@ -5,12 +5,16 @@ package api
 
 import (
 	externalRef0 "github.com/Jacobbrewer1/pagefilter/common"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Player defines the model for player.
 type Player struct {
-	Id   *int64  `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	DateOfBirth *openapi_types.Date  `json:"date_of_birth,omitempty"`
+	Email       *openapi_types.Email `json:"email,omitempty"`
+	FirstName   *string              `json:"first_name,omitempty"`
+	Id          *int64               `json:"id,omitempty"`
+	LastName    *string              `json:"last_name,omitempty"`
 }
 
 // PlayersResponse defines the model for players_response.

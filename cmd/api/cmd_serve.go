@@ -12,6 +12,7 @@ import (
 
 	"github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/api"
 	"github.com/Jacobbrewer1/league-manager/pkg/logging"
+	repo2 "github.com/Jacobbrewer1/league-manager/pkg/repositories/api"
 	svc "github.com/Jacobbrewer1/league-manager/pkg/services/api"
 	"github.com/Jacobbrewer1/uhttp"
 	"github.com/Jacobbrewer1/vaulty"
@@ -143,7 +144,8 @@ func (s *serveCmd) setup(ctx context.Context, r *mux.Router) (err error) {
 
 	slog.Info("Database connection generate from vault secrets")
 
-	service := svc.NewService()
+	repo := repo2.NewRepository(db)
+	service := svc.NewService(repo)
 
 	r.HandleFunc("/metrics", uhttp.InternalOnly(promhttp.Handler())).Methods(http.MethodGet)
 	r.HandleFunc("/health", uhttp.InternalOnly(healthHandler(db))).Methods(http.MethodGet)
@@ -151,7 +153,7 @@ func (s *serveCmd) setup(ctx context.Context, r *mux.Router) (err error) {
 	r.NotFoundHandler = uhttp.NotFoundHandler()
 	r.MethodNotAllowedHandler = uhttp.MethodNotAllowedHandler()
 
-	api.RegisterHandlers(
+	api.RegisterUnauthedHandlers(
 		r,
 		service,
 		api.WithMetricsMiddleware(metricsMiddleware),
