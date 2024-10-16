@@ -29,4 +29,16 @@ type Repository interface {
 
 	// UpdateTeam updates a team.
 	UpdateTeam(id int64, team *models.Team) error
+
+	// GetSeasons gets a list of seasons.
+	GetSeasons(details *pagefilter.PaginatorDetails, filters *GetSeasonsFilters) (*pagefilter.PaginatedResponse[models.Season], error)
+
+	// CreateSeason creates a season.
+	CreateSeason(season *models.Season) error
+
+	// GetSeason gets a season by ID.
+	GetSeason(id int64) (*models.Season, error)
+
+	// UpdateSeason updates a season.
+	UpdateSeason(id int64, season *models.Season) error
 }

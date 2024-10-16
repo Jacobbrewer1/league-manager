@@ -23,6 +23,18 @@ type PlayersResponse struct {
 	Total   int64    `json:"total"`
 }
 
+// Season defines the model for season.
+type Season struct {
+	Id   *int64  `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
+// SeasonsResponse defines the model for seasons_response.
+type SeasonsResponse struct {
+	Seasons []Season `json:"seasons"`
+	Total   int64    `json:"total"`
+}
+
 // Team defines the model for team.
 type Team struct {
 	ContactEmail *openapi_types.Email `json:"contact_email,omitempty"`
@@ -70,6 +82,30 @@ type GetPlayersParams struct {
 // GetPlayersParamsSortDir defines parameters for GetPlayers.
 type GetPlayersParamsSortDir string
 
+// GetSeasonsParams defines parameters for GetSeasons.
+type GetSeasonsParams struct {
+	// Limit Report type
+	Limit *externalRef1.LimitParam `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// LastVal Pagination details, last value of the sort column on the previous page.
+	LastVal *externalRef1.LastValue `form:"last_val,omitempty" json:"last_val,omitempty"`
+
+	// LastId Pagination details, last value of the id column on the previous page.
+	LastId *externalRef1.LastId `form:"last_id,omitempty" json:"last_id,omitempty"`
+
+	// SortBy Pagination details, sort column, if empty uses the id column.
+	SortBy *externalRef1.SortBy `form:"sort_by,omitempty" json:"sort_by,omitempty"`
+
+	// SortDir Pagination details, sorting order.
+	SortDir *GetSeasonsParamsSortDir `form:"sort_dir,omitempty" json:"sort_dir,omitempty"`
+
+	// Name The name to filter by
+	Name *QueryName `form:"name,omitempty" json:"name,omitempty"`
+}
+
+// GetSeasonsParamsSortDir defines parameters for GetSeasons.
+type GetSeasonsParamsSortDir string
+
 // GetTeamsParams defines parameters for GetTeams.
 type GetTeamsParams struct {
 	// Limit Report type
@@ -105,6 +141,18 @@ type UpdatePlayerJSONRequestBody = Player
 
 // Temporary inclusion of type alias for backwards compatibility
 type UpdatePlayerJSONBody = Player
+
+// CreateSeasonJSONRequestBody defines body for CreateSeason for application/json ContentType.
+type CreateSeasonJSONRequestBody = Season
+
+// Temporary inclusion of type alias for backwards compatibility
+type CreateSeasonJSONBody = Season
+
+// UpdateSeasonJSONRequestBody defines body for UpdateSeason for application/json ContentType.
+type UpdateSeasonJSONRequestBody = Season
+
+// Temporary inclusion of type alias for backwards compatibility
+type UpdateSeasonJSONBody = Season
 
 // CreateTeamJSONRequestBody defines body for CreateTeam for application/json ContentType.
 type CreateTeamJSONRequestBody = Team

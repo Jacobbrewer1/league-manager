@@ -105,9 +105,16 @@ func (s *service) CreateTeam(w http.ResponseWriter, r *http.Request, body0 *api.
 	team := mapAPITeamToModel(body0)
 	err := s.r.CreateTeam(team)
 	if err != nil {
-		l.Error("Failed to create team", slog.String(logging.KeyError, err.Error()))
-		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to create team", err)
-		return
+		switch {
+		case errors.Is(err, repo.ErrDuplicateTeam):
+			l.Error("Team already exists", slog.String(logging.KeyError, err.Error()))
+			uhttp.SendErrorMessageWithStatus(w, http.StatusConflict, "team already exists", err)
+			return
+		default:
+			l.Error("Error creating team", slog.String(logging.KeyError, err.Error()))
+			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error creating team", err)
+			return
+		}
 	}
 
 	resp := modelAsApiTeam(team)
