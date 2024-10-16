@@ -15,7 +15,7 @@ func NewFirstnameLike(fn string) pagefilter.Wherer {
 
 // Where returns the where clause for the filter.
 func (f *firstnameLike) Where() (string, []interface{}) {
-	return "first_name LIKE ?", []interface{}{f.fnl}
+	return "first_name LIKE ?", []interface{}{"%" + f.fnl + "%"}
 }
 
 func (f *firstnameLike) WhereType() pagefilter.WhereType {

@@ -15,7 +15,7 @@ func NewLastnameLike(ln string) pagefilter.Wherer {
 
 // Where returns the where clause for the filter.
 func (f *lastnameLike) Where() (string, []interface{}) {
-	return "last_name LIKE ?", []interface{}{f.lnl}
+	return "last_name LIKE ?", []interface{}{"%" + f.lnl + "%"}
 }
 
 func (f *lastnameLike) WhereType() pagefilter.WhereType {
