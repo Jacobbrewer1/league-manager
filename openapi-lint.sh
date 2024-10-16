@@ -5,11 +5,6 @@ if [[ $1 == "--debug" ]]; then
   debug=true
 fi
 
-if ! command -v gum &>/dev/null; then
-  gum style --foreground 196 "gum is required to generate models. Please install it by running 'make deps'"
-  exit 1
-fi
-
 # Check that the IBM OpenAPI Linter is installed
 if ! command -v lint-openapi >/dev/null; then
   gum style --foreground 196 "Error: IBM OpenAPI Linter is not installed. Please install the linter by following the instructions at https://github.com/IBM/openapi-validator"
