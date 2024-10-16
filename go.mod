@@ -5,6 +5,7 @@ go 1.23
 toolchain go1.23.1
 
 require (
+	github.com/Jacobbrewer1/goschema v0.0.1
 	github.com/Jacobbrewer1/pagefilter v0.1.3
 	github.com/Jacobbrewer1/patcher v0.1.4
 	github.com/Jacobbrewer1/uhttp v0.0.2
@@ -45,7 +46,7 @@ require (
 	github.com/hashicorp/vault/api v1.15.0 // indirect
 	github.com/hashicorp/vault/api/auth/approle v0.8.0 // indirect
 	github.com/hashicorp/vault/api/auth/userpass v0.8.0 // indirect
-	github.com/huandu/xstrings v1.4.0 // indirect
+	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jinzhu/copier v0.3.5 // indirect

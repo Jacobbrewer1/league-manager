@@ -4,7 +4,7 @@
 package models
 
 import (
-	"github.com/Jacobbrewer1/goschema/usql"
+	"github.com/Jacobbrewer1/goschema/pkg/usql"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
