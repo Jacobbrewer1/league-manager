@@ -295,9 +295,6 @@ func RegisterUnauthedHandlers(router *mux.Router, si ServerInterface, opts ...Se
 	router.Use(uhttp.AuthHeaderToContextMux())
 	router.Use(uhttp.GenerateOrCopyRequestIDMux())
 
-	// We do not have a gateway preparer here as no auth is sent.
-
 	router.Methods(http.MethodGet).Path("/players").Handler(wrapHandler(wrapper.GetPlayers))
-
 	router.Methods(http.MethodPost).Path("/players").Handler(wrapHandler(wrapper.CreatePlayer))
 }

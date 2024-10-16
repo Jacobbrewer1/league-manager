@@ -153,7 +153,7 @@ func (s *serveCmd) setup(ctx context.Context, r *mux.Router) (err error) {
 	r.NotFoundHandler = uhttp.NotFoundHandler()
 	r.MethodNotAllowedHandler = uhttp.MethodNotAllowedHandler()
 
-	api.RegisterHandlers(
+	api.RegisterUnauthedHandlers(
 		r,
 		service,
 		api.WithMetricsMiddleware(metricsMiddleware),
