@@ -9,8 +9,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// Teams represents a row from 'teams'.
-type Teams struct {
+// Team represents a row from 'team'.
+type Team struct {
 	Id            int       `db:"id,autoinc,pk"`
 	Name          string    `db:"name"`
 	ContactEmail  string    `db:"contact_email"`
@@ -18,12 +18,12 @@ type Teams struct {
 	UpdatedAt     time.Time `db:"updated_at"`
 }
 
-// Insert inserts the Teams to the database.
-func (m *Teams) Insert(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Teams"))
+// Insert inserts the Team to the database.
+func (m *Team) Insert(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Team"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "INSERT INTO teams (" +
+	const sqlstr = "INSERT INTO team (" +
 		"`name`, `contact_email`, `contact_mobile`, `updated_at`" +
 		") VALUES (" +
 		"?, ?, ?, ?" +
@@ -44,15 +44,15 @@ func (m *Teams) Insert(db DB) error {
 	return nil
 }
 
-func InsertManyTeamss(db DB, ms ...*Teams) error {
+func InsertManyTeams(db DB, ms ...*Team) error {
 	if len(ms) == 0 {
 		return nil
 	}
 
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_many_Teams"))
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_many_Team"))
 	defer t.ObserveDuration()
 
-	var sqlstr = "INSERT INTO teams (" +
+	var sqlstr = "INSERT INTO team (" +
 		"`name`,`contact_email`,`contact_mobile`,`updated_at`" +
 		") VALUES"
 
@@ -83,16 +83,16 @@ func InsertManyTeamss(db DB, ms ...*Teams) error {
 }
 
 // IsPrimaryKeySet returns true if all primary key fields are set to none zero values
-func (m *Teams) IsPrimaryKeySet() bool {
+func (m *Team) IsPrimaryKeySet() bool {
 	return IsKeySet(m.Id)
 }
 
-// Update updates the Teams in the database.
-func (m *Teams) Update(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("update_Teams"))
+// Update updates the Team in the database.
+func (m *Team) Update(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("update_Team"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "UPDATE teams " +
+	const sqlstr = "UPDATE team " +
 		"SET `name` = ?, `contact_email` = ?, `contact_mobile` = ?, `updated_at` = ? " +
 		"WHERE `id` = ?"
 
@@ -112,13 +112,13 @@ func (m *Teams) Update(db DB) error {
 	return nil
 }
 
-// InsertWithUpdate inserts the Teams to the database, and tries to update
+// InsertWithUpdate inserts the Team to the database, and tries to update
 // on unique constraint violations.
-func (m *Teams) InsertWithUpdate(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_update_Teams"))
+func (m *Team) InsertWithUpdate(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_update_Team"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "INSERT INTO teams (" +
+	const sqlstr = "INSERT INTO team (" +
 		"`name`, `contact_email`, `contact_mobile`, `updated_at`" +
 		") VALUES (" +
 		"?, ?, ?, ?" +
@@ -140,29 +140,29 @@ func (m *Teams) InsertWithUpdate(db DB) error {
 	return nil
 }
 
-// Save saves the Teams to the database.
-func (m *Teams) Save(db DB) error {
+// Save saves the Team to the database.
+func (m *Team) Save(db DB) error {
 	if m.IsPrimaryKeySet() {
 		return m.Update(db)
 	}
 	return m.Insert(db)
 }
 
-// SaveOrUpdate saves the Teams to the database, but tries to update
+// SaveOrUpdate saves the Team to the database, but tries to update
 // on unique constraint violations.
-func (m *Teams) SaveOrUpdate(db DB) error {
+func (m *Team) SaveOrUpdate(db DB) error {
 	if m.IsPrimaryKeySet() {
 		return m.Update(db)
 	}
 	return m.InsertWithUpdate(db)
 }
 
-// Delete deletes the Teams from the database.
-func (m *Teams) Delete(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("delete_Teams"))
+// Delete deletes the Team from the database.
+func (m *Team) Delete(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("delete_Team"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "DELETE FROM teams WHERE `id` = ?"
+	const sqlstr = "DELETE FROM team WHERE `id` = ?"
 
 	DBLog(sqlstr, m.Id)
 	_, err := db.Exec(sqlstr, m.Id)
@@ -170,19 +170,19 @@ func (m *Teams) Delete(db DB) error {
 	return err
 }
 
-// TeamsById retrieves a row from 'teams' as a Teams.
+// TeamById retrieves a row from 'team' as a Team.
 //
 // Generated from primary key.
-func TeamsById(db DB, id int) (*Teams, error) {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Teams"))
+func TeamById(db DB, id int) (*Team, error) {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Team"))
 	defer t.ObserveDuration()
 
 	const sqlstr = "SELECT `id`, `name`, `contact_email`, `contact_mobile`, `updated_at` " +
-		"FROM teams " +
+		"FROM team " +
 		"WHERE `id` = ?"
 
 	DBLog(sqlstr, id)
-	var m Teams
+	var m Team
 	if err := db.Get(&m, sqlstr, id); err != nil {
 		return nil, err
 	}
@@ -190,19 +190,19 @@ func TeamsById(db DB, id int) (*Teams, error) {
 	return &m, nil
 }
 
-// TeamsByName retrieves a row from 'teams' as a *Teams.
+// TeamByName retrieves a row from 'team' as a *Team.
 //
 // Generated from index 'teams_name_uindex' of type 'unique'.
-func TeamsByName(db DB, name string) (*Teams, error) {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Teams"))
+func TeamByName(db DB, name string) (*Team, error) {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Team"))
 	defer t.ObserveDuration()
 
 	const sqlstr = "SELECT `id`, `name`, `contact_email`, `contact_mobile`, `updated_at` " +
-		"FROM teams " +
+		"FROM team " +
 		"WHERE `name` = ?"
 
 	DBLog(sqlstr, name)
-	var m Teams
+	var m Team
 	if err := db.Get(&m, sqlstr, name); err != nil {
 		return nil, err
 	}

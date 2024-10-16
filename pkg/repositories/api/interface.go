@@ -17,4 +17,7 @@ type Repository interface {
 
 	// UpdatePlayer updates a player.
 	UpdatePlayer(id int64, player *models.Player) error
+
+	// GetTeams gets a list of teams.
+	GetTeams(details *pagefilter.PaginatorDetails, filters *GetTeamsFilters) (*pagefilter.PaginatedResponse[models.Team], error)
 }

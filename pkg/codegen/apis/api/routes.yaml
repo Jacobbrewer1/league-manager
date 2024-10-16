@@ -161,6 +161,69 @@ paths:
               schema:
                 $ref: '../common/common.yaml#/components/schemas/error_message'
 
+  /teams:
+    get:
+      tags:
+        - teams
+      summary: Get all teams
+      operationId: getTeams
+      parameters:
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/limit_param'
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/last_value'
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/last_id'
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/sort_by'
+        - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/sort_direction'
+        - $ref: '#/components/parameters/query_name'
+      responses:
+        '200':
+          description: A list of teams
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/teams_response'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+    post:
+      tags:
+        - teams
+      summary: Create a team
+      operationId: createTeam
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/team'
+      responses:
+        '201':
+          description: Team created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/team'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+
 components:
   parameters:
     query_year:
@@ -226,6 +289,20 @@ components:
         date_of_birth:
           type: string
           format: date
+
+    teams_response:
+      type: object
+      required:
+        - teams
+        - total
+      properties:
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/team'
+        total:
+          type: integer
+          format: int64
 
     team:
       type: object

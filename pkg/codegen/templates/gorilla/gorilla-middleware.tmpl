@@ -234,7 +234,7 @@ func (siw *ServerInterfaceWrapper) {{$opid}}(w http.ResponseWriter, r *http.Requ
       return
     }
     {{ else }}
-    siw.handler.{{.OperationId}}(cw, r{{genParamNames .PathParams}}{{if .RequiresParamObject}}, params{{end}}{{ if gt (len .Bodies) 0 }}, body{{end}})
+    siw.handler.{{.OperationId}}(w, r{{genParamNames .PathParams}}{{if .RequiresParamObject}}, params{{end}}{{ if gt (len .Bodies) 0 }}, body{{end}})
     {{ end -}}
   }))
 

@@ -1,4 +1,4 @@
-create table teams
+create table team
 (
     id             int          not null auto_increment,
     name           varchar(25)  not null,
