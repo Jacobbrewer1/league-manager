@@ -12,6 +12,7 @@ import (
 // Match represents a row from 'match'.
 type Match struct {
 	Id             int       `db:"id,autoinc,pk"`
+	SeasonId       int       `db:"season_id"`
 	HomePartnersId int       `db:"home_partners_id"`
 	AwayPartnersId int       `db:"away_partners_id"`
 	MatchDate      time.Time `db:"match_date"`
@@ -23,13 +24,13 @@ func (m *Match) Insert(db DB) error {
 	defer t.ObserveDuration()
 
 	const sqlstr = "INSERT INTO match (" +
-		"`home_partners_id`, `away_partners_id`, `match_date`" +
+		"`season_id`, `home_partners_id`, `away_partners_id`, `match_date`" +
 		") VALUES (" +
-		"?, ?, ?" +
+		"?, ?, ?, ?" +
 		")"
 
-	DBLog(sqlstr, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
-	res, err := db.Exec(sqlstr, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
+	DBLog(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
+	res, err := db.Exec(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
 	if err != nil {
 		return err
 	}
@@ -52,15 +53,15 @@ func InsertManyMatchs(db DB, ms ...*Match) error {
 	defer t.ObserveDuration()
 
 	var sqlstr = "INSERT INTO match (" +
-		"`home_partners_id`,`away_partners_id`,`match_date`" +
+		"`season_id`,`home_partners_id`,`away_partners_id`,`match_date`" +
 		") VALUES"
 
 	var args []interface{}
 	for _, m := range ms {
 		sqlstr += " (" +
-			"?,?,?" +
+			"?,?,?,?" +
 			"),"
-		args = append(args, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
+		args = append(args, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
 	}
 
 	DBLog(sqlstr, args...)
@@ -92,11 +93,11 @@ func (m *Match) Update(db DB) error {
 	defer t.ObserveDuration()
 
 	const sqlstr = "UPDATE match " +
-		"SET `home_partners_id` = ?, `away_partners_id` = ?, `match_date` = ? " +
+		"SET `season_id` = ?, `home_partners_id` = ?, `away_partners_id` = ?, `match_date` = ? " +
 		"WHERE `id` = ?"
 
-	DBLog(sqlstr, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.Id)
-	res, err := db.Exec(sqlstr, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.Id)
+	DBLog(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.Id)
+	res, err := db.Exec(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.Id)
 	if err != nil {
 		return err
 	}
@@ -118,14 +119,14 @@ func (m *Match) InsertWithUpdate(db DB) error {
 	defer t.ObserveDuration()
 
 	const sqlstr = "INSERT INTO match (" +
-		"`home_partners_id`, `away_partners_id`, `match_date`" +
+		"`season_id`, `home_partners_id`, `away_partners_id`, `match_date`" +
 		") VALUES (" +
-		"?, ?, ?" +
+		"?, ?, ?, ?" +
 		") ON DUPLICATE KEY UPDATE " +
-		"`home_partners_id` = VALUES(`home_partners_id`), `away_partners_id` = VALUES(`away_partners_id`), `match_date` = VALUES(`match_date`)"
+		"`season_id` = VALUES(`season_id`), `home_partners_id` = VALUES(`home_partners_id`), `away_partners_id` = VALUES(`away_partners_id`), `match_date` = VALUES(`match_date`)"
 
-	DBLog(sqlstr, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
-	res, err := db.Exec(sqlstr, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
+	DBLog(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
+	res, err := db.Exec(sqlstr, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate)
 	if err != nil {
 		return err
 	}
@@ -176,7 +177,7 @@ func MatchById(db DB, id int) (*Match, error) {
 	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Match"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "SELECT `id`, `home_partners_id`, `away_partners_id`, `match_date` " +
+	const sqlstr = "SELECT `id`, `season_id`, `home_partners_id`, `away_partners_id`, `match_date` " +
 		"FROM match " +
 		"WHERE `id` = ?"
 
@@ -187,6 +188,13 @@ func MatchById(db DB, id int) (*Match, error) {
 	}
 
 	return &m, nil
+}
+
+// GetSeasonIdSeason Gets an instance of Season
+//
+// Generated from constraint match_season_id_fk
+func (m *Match) GetSeasonIdSeason(db DB) (*Season, error) {
+	return SeasonById(db, m.SeasonId)
 }
 
 // GetHomePartnersIdPartnership Gets an instance of Partnership
