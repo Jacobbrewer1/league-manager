@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 if ! command -v goschema &> /dev/null; then
-  gum style --foreground 196 "goschema is required to generate models. Please install it by running 'go get github.com/jbrewer/goschema'"
+  gum style --foreground 196 "goschema is required to generate models. Please install it"
   exit 1
 fi
 
 if ! command -v gum &> /dev/null; then
-  gum style --foreground 196 "gum is required to generate models. Please install it by running 'go get github.com/jbrewer/gum'"
+  gum style --foreground 196 "gum is required to generate models. Please install it by running 'make deps'"
   exit 1
 fi
 
@@ -17,7 +17,7 @@ fi
 
 # If the "--all" flag is passed, generate all models
 if [ "$1" == "--all" ]; then
-  gum spin "$(goschema generate --templates=./templates/*tmpl --out=./ --sql=./schemas/*.sql)" --spinner dot --title "Generating all models"
+  gum spin --spinner dot --title "Generating all models" -- goschema generate --templates=./templates/*tmpl --out=./ --sql=./schemas/*.sql
   go fmt ./*.go
   goimports -w ./*.go
   exit 0

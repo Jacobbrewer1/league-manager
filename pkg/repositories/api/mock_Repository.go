@@ -13,6 +13,24 @@ type MockRepository struct {
 	mock.Mock
 }
 
+// CreatePlayer provides a mock function with given fields: player
+func (_m *MockRepository) CreatePlayer(player *models.Player) error {
+	ret := _m.Called(player)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreatePlayer")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*models.Player) error); ok {
+		r0 = rf(player)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetPlayers provides a mock function with given fields: details, filters
 func (_m *MockRepository) GetPlayers(details *pagefilter.PaginatorDetails, filters *GetPlayersFilters) (*pagefilter.PaginatedResponse[models.Player], error) {
 	ret := _m.Called(details, filters)

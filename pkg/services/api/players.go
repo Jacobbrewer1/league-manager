@@ -55,7 +55,7 @@ func (s *service) GetPlayers(w http.ResponseWriter, r *http.Request, params api.
 
 	respArray := make([]api.Player, len(players.Items))
 	for i, player := range players.Items {
-		respArray[i] = *s.modelAsApiPlayer(player)
+		respArray[i] = *modelAsApiPlayer(player)
 	}
 
 	resp := &api.PlayersResponse{
@@ -69,7 +69,7 @@ func (s *service) GetPlayers(w http.ResponseWriter, r *http.Request, params api.
 	}
 }
 
-func (s *service) modelAsApiPlayer(player *models.Player) *api.Player {
+func modelAsApiPlayer(player *models.Player) *api.Player {
 	return &api.Player{
 		Id:          utils.Ptr(int64(player.Id)),
 		FirstName:   utils.Ptr(player.FirstName),
@@ -92,6 +92,68 @@ func (s *service) getPlayersFilters(
 }
 
 func (s *service) CreatePlayer(w http.ResponseWriter, r *http.Request, body0 *api.CreatePlayerJSONBody) {
-	//TODO implement me
-	panic("implement me")
+	l := logging.LoggerFromRequest(r)
+
+	if err := s.validatePlayer(body0); err != nil {
+		l.Error("Invalid player", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusBadRequest, "invalid player", err)
+		return
+	}
+
+	p := mapAPIPlayerToModel(body0)
+
+	if err := s.r.CreatePlayer(p); err != nil {
+		l.Error("Failed to create player", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to create player", err)
+		return
+	}
+
+	resp := modelAsApiPlayer(p)
+
+	if err := uhttp.Encode(w, http.StatusCreated, resp); err != nil {
+		l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
+		return
+	}
+}
+
+func (s *service) validatePlayer(player *api.Player) error {
+	if player.FirstName == nil || *player.FirstName == "" {
+		return errors.New("first name is required")
+	}
+
+	if player.LastName == nil || *player.LastName == "" {
+		return errors.New("last name is required")
+	}
+
+	if player.Email == nil || *player.Email == "" {
+		return errors.New("email is required")
+	}
+
+	if player.DateOfBirth == nil {
+		return errors.New("date of birth is required")
+	}
+
+	return nil
+}
+
+func mapAPIPlayerToModel(player *api.Player) *models.Player {
+	p := new(models.Player)
+
+	if player.FirstName != nil {
+		p.FirstName = *player.FirstName
+	}
+
+	if player.LastName != nil {
+		p.LastName = *player.LastName
+	}
+
+	if player.Email != nil {
+		p.Email = string(*player.Email)
+	}
+
+	if player.DateOfBirth != nil {
+		p.Dob = player.DateOfBirth.Time
+	}
+
+	return p
 }
