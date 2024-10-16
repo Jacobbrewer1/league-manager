@@ -33,6 +33,12 @@ type ServerInterface interface {
 	// Create a team
 	// (POST /teams)
 	CreateTeam(w http.ResponseWriter, r *http.Request, body0 *CreateTeamJSONBody)
+	// Get a team by ID
+	// (GET /teams/{id})
+	GetTeamByID(w http.ResponseWriter, r *http.Request, id int64)
+	// Update a team
+	// (PATCH /teams/{id})
+	UpdateTeam(w http.ResponseWriter, r *http.Request, id int64, body0 *UpdateTeamJSONBody)
 }
 
 type RateLimiterFunc = func(http.ResponseWriter, *http.Request) error
@@ -368,6 +374,79 @@ func (siw *ServerInterfaceWrapper) CreateTeam(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(cw, r.WithContext(ctx))
 }
 
+// GetTeamByID operation middleware
+func (siw *ServerInterfaceWrapper) GetTeamByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", mux.Vars(r)["id"], &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.GetTeamByID(w, r, id)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
+// UpdateTeam operation middleware
+func (siw *ServerInterfaceWrapper) UpdateTeam(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", mux.Vars(r)["id"], &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Body parameter for UpdateTeam for application/json ContentType -------------
+	body := new(UpdateTeamJSONRequestBody)
+	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+		siw.errorHandlerFunc(cw, r, &UnmarshalingParamError{ParamName: "body", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.UpdateTeam(w, r, id, body)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -490,4 +569,6 @@ func RegisterUnauthedHandlers(router *mux.Router, si ServerInterface, opts ...Se
 	router.Methods(http.MethodPatch).Path("/players/{id}").Handler(wrapHandler(wrapper.UpdatePlayer))
 	router.Methods(http.MethodGet).Path("/teams").Handler(wrapHandler(wrapper.GetTeams))
 	router.Methods(http.MethodPost).Path("/teams").Handler(wrapHandler(wrapper.CreateTeam))
+	router.Methods(http.MethodGet).Path("/teams/{id}").Handler(wrapHandler(wrapper.GetTeamByID))
+	router.Methods(http.MethodPatch).Path("/teams/{id}").Handler(wrapHandler(wrapper.UpdateTeam))
 }

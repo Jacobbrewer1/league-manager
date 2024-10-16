@@ -111,3 +111,9 @@ type CreateTeamJSONRequestBody = Team
 
 // Temporary inclusion of type alias for backwards compatibility
 type CreateTeamJSONBody = Team
+
+// UpdateTeamJSONRequestBody defines body for UpdateTeam for application/json ContentType.
+type UpdateTeamJSONRequestBody = Team
+
+// Temporary inclusion of type alias for backwards compatibility
+type UpdateTeamJSONBody = Team

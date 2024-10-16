@@ -23,4 +23,10 @@ type Repository interface {
 
 	// CreateTeam creates a team.
 	CreateTeam(team *models.Team) error
+
+	// GetTeam gets a team by ID.
+	GetTeam(id int64) (*models.Team, error)
+
+	// UpdateTeam updates a team.
+	UpdateTeam(id int64, team *models.Team) error
 }

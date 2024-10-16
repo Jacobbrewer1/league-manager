@@ -228,7 +228,6 @@ func (s *service) UpdatePlayer(w http.ResponseWriter, r *http.Request, id int64,
 	}
 
 	resp := modelAsApiPlayer(currentPlayer)
-
 	if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
 		l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
 		return

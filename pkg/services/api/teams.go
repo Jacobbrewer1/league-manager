@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"reflect"
 
 	"github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/api"
 	"github.com/Jacobbrewer1/league-manager/pkg/logging"
@@ -12,6 +13,7 @@ import (
 	"github.com/Jacobbrewer1/league-manager/pkg/utils"
 	"github.com/Jacobbrewer1/pagefilter"
 	"github.com/Jacobbrewer1/pagefilter/common"
+	"github.com/Jacobbrewer1/patcher"
 	"github.com/Jacobbrewer1/uhttp"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
@@ -147,4 +149,74 @@ func (s *service) validateTeam(body0 *api.CreateTeamJSONBody) error {
 	}
 
 	return nil
+}
+
+func (s *service) GetTeamByID(w http.ResponseWriter, r *http.Request, id int64) {
+	l := logging.LoggerFromRequest(r)
+
+	team, err := s.r.GetTeam(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, repo.ErrTeamNotFound):
+			uhttp.SendErrorMessageWithStatus(w, http.StatusNotFound, "team not found", err)
+			return
+		default:
+			l.Error("Error getting team", slog.String(logging.KeyError, err.Error()))
+			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting team", err)
+			return
+		}
+	}
+
+	resp := modelAsApiTeam(team)
+	if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
+		l.Error("Error encoding response", slog.String(logging.KeyError, err.Error()))
+		return
+	}
+}
+
+func (s *service) UpdateTeam(w http.ResponseWriter, r *http.Request, id int64, body0 *api.UpdateTeamJSONBody) {
+	l := logging.LoggerFromRequest(r)
+
+	currentTeam, err := s.r.GetTeam(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, repo.ErrTeamNotFound):
+			uhttp.SendErrorMessageWithStatus(w, http.StatusNotFound, "team not found", err)
+			return
+		default:
+			l.Error("Error getting team", slog.String(logging.KeyError, err.Error()))
+			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting team", err)
+			return
+		}
+	}
+
+	changesModel := mapAPITeamToModel(body0)
+	currentTeamCopy := *currentTeam
+
+	if err := patcher.LoadDiff(currentTeam, changesModel); err != nil {
+		l.Error("Failed to load diff", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to load diff", err)
+		return
+	}
+
+	if reflect.DeepEqual(currentTeam, &currentTeamCopy) {
+		l.Info("No changes detected")
+		if err := uhttp.Encode(w, http.StatusOK, modelAsApiTeam(currentTeam)); err != nil {
+			l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
+			return
+		}
+		return
+	}
+
+	if err := s.r.UpdateTeam(id, currentTeam); err != nil {
+		l.Error("Failed to update team", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to update team", err)
+		return
+	}
+
+	resp := modelAsApiTeam(currentTeam)
+	if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
+		l.Error("Failed to encode response", slog.String(logging.KeyError, err.Error()))
+		return
+	}
 }

@@ -103,3 +103,30 @@ func (r *repository) CreateTeam(team *models.Team) error {
 
 	return nil
 }
+
+func (r *repository) GetTeam(id int64) (*models.Team, error) {
+	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("get_team"))
+	defer t.ObserveDuration()
+
+	team, err := models.TeamById(r.db, int(id))
+	if err != nil {
+		return nil, fmt.Errorf("get team by id: %w", err)
+	}
+
+	return team, nil
+}
+
+func (r *repository) UpdateTeam(id int64, team *models.Team) error {
+	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("update_team"))
+	defer t.ObserveDuration()
+
+	team.Id = int(id)
+	team.ContactEmail = strings.ToLower(team.ContactEmail)
+	team.UpdatedAt = time.Now().UTC()
+
+	if err := team.Update(r.db); err != nil {
+		return fmt.Errorf("update team: %w", err)
+	}
+
+	return nil
+}

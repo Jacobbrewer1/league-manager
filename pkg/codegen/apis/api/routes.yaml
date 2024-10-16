@@ -224,6 +224,90 @@ paths:
               schema:
                 $ref: '../common/common.yaml#/components/schemas/error_message'
 
+  /teams/{id}:
+    get:
+      tags:
+        - teams
+      summary: Get a team by ID
+      operationId: getTeamByID
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the team
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A team
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/team'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '404':
+          description: Team not found
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+    patch:
+      tags:
+        - teams
+      summary: Update a team
+      operationId: updateTeam
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the team
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/team'
+      responses:
+        '200':
+          description: Team updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/team'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '404':
+          description: Team not found
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../common/common.yaml#/components/schemas/error_message'
+
 components:
   parameters:
     query_year:
