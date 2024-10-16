@@ -10,6 +10,27 @@ create table player
 )
     with system versioning;
 
+create table season
+(
+    id   int auto_increment
+        primary key,
+    name varchar(25) not null,
+    constraint season_name_uindex
+        unique (name)
+);
+
+create table team
+(
+    id             int auto_increment
+        primary key,
+    name           varchar(25)  not null,
+    contact_email  varchar(255) not null,
+    contact_mobile varchar(255) not null,
+    updated_at     datetime     not null,
+    constraint teams_name_uindex
+        unique (name)
+);
+
 create table partnership
 (
     id          int auto_increment
@@ -53,26 +74,5 @@ create table score
         foreign key (match_id) references `match` (id),
     constraint score_partnership_id_fk
         foreign key (partnership_id) references partnership (id)
-);
-
-create table season
-(
-    id   int auto_increment
-        primary key,
-    name varchar(25) not null,
-    constraint season_name_uindex
-        unique (name)
-);
-
-create table team
-(
-    id             int auto_increment
-        primary key,
-    name           varchar(25)  not null,
-    contact_email  varchar(255) not null,
-    contact_mobile varchar(255) not null,
-    updated_at     datetime     not null,
-    constraint teams_name_uindex
-        unique (name)
 );
 
