@@ -76,7 +76,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get install jq
-          make deps
+          brew install gum
 
       - name: Lint OpenAPI
         shell: bash
