@@ -91,7 +91,7 @@ func (s *service) GetGames(w http.ResponseWriter, r *http.Request, params api.Ge
 			return
 		}
 
-		respMatch.HomeTeam = &api.MatchPartnership{
+		respMatch.HomeTeam = &api.GamePartnership{
 			Partnership: homeAPI,
 			Scores:      modelAsAPIScore(homeScore),
 		}
@@ -117,7 +117,7 @@ func (s *service) GetGames(w http.ResponseWriter, r *http.Request, params api.Ge
 			return
 		}
 
-		respMatch.AwayTeam = &api.MatchPartnership{
+		respMatch.AwayTeam = &api.GamePartnership{
 			Partnership: awayAPI,
 			Scores:      modelAsAPIScore(awayScore),
 		}
@@ -182,7 +182,7 @@ func (s *service) getMatchesFilters(
 	return f, nil
 }
 
-func (s *service) CreateMatch(w http.ResponseWriter, r *http.Request, body0 *api.CreateMatchJSONBody) {
+func (s *service) CreateGame(w http.ResponseWriter, r *http.Request, body0 *api.CreateGameJSONBody) {
 	l := logging.LoggerFromRequest(r)
 
 	if err := s.validateCreateMatch(body0); err != nil {
@@ -273,7 +273,7 @@ func scoreAsModel(s *api.Scores) *models.Score {
 	return score
 }
 
-func matchAsModel(m *api.CreateMatchJSONBody) (*models.Game, error) {
+func matchAsModel(m *api.CreateGameJSONBody) (*models.Game, error) {
 	match := new(models.Game)
 
 	date, err := time.Parse(time.RFC3339, *m.MatchDate)
@@ -297,7 +297,7 @@ func matchAsModel(m *api.CreateMatchJSONBody) (*models.Game, error) {
 	return match, nil
 }
 
-func (s *service) validateCreateMatch(body *api.CreateMatchJSONBody) error {
+func (s *service) validateCreateMatch(body *api.CreateGameJSONBody) error {
 	if body == nil {
 		return errors.New("request body is nil")
 	}
