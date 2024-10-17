@@ -729,6 +729,9 @@ components:
 
     scores:
       type: object
+      required:
+        - first_set
+        - second_set
       properties:
         first_set:
           type: integer

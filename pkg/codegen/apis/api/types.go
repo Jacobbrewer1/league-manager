@@ -54,8 +54,8 @@ type PlayersResponse struct {
 
 // Scores defines the model for scores.
 type Scores struct {
-	FirstSet  *int64 `json:"first_set,omitempty"`
-	SecondSet *int64 `json:"second_set,omitempty"`
+	FirstSet  int64  `json:"first_set"`
+	SecondSet int64  `json:"second_set"`
 	ThirdSet  *int64 `json:"third_set,omitempty"`
 }
 

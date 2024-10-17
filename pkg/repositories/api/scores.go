@@ -26,3 +26,11 @@ func (r *repository) GetScoreByMatchAndPartnership(matchID, partnershipID int64)
 
 	return score, nil
 }
+
+func (r *repository) SaveScore(score *models.Score) error {
+	if err := score.Save(r.db); err != nil {
+		return fmt.Errorf("error saving score: %w", err)
+	}
+
+	return nil
+}

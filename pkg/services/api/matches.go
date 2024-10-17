@@ -2,10 +2,12 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
 
+	"github.com/Jacobbrewer1/goschema/pkg/usql"
 	"github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/api"
 	"github.com/Jacobbrewer1/league-manager/pkg/logging"
 	"github.com/Jacobbrewer1/league-manager/pkg/models"
@@ -137,8 +139,8 @@ func (s *service) GetMatches(w http.ResponseWriter, r *http.Request, params api.
 
 func modelAsAPIScore(score *models.Score) *api.Scores {
 	s := &api.Scores{
-		FirstSet:  utils.Ptr(int64(score.FirstSetScore)),
-		SecondSet: utils.Ptr(int64(score.SecondSetScore)),
+		FirstSet:  int64(score.FirstSetScore),
+		SecondSet: int64(score.SecondSetScore),
 	}
 
 	if score.ThirdSetScore.Valid {
@@ -181,6 +183,186 @@ func (s *service) getMatchesFilters(
 }
 
 func (s *service) CreateMatch(w http.ResponseWriter, r *http.Request, body0 *api.CreateMatchJSONBody) {
-	//TODO implement me
-	panic("implement me")
+	l := logging.LoggerFromRequest(r)
+
+	if err := s.validateCreateMatch(body0); err != nil {
+		l.Error("Failed to validate request", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusBadRequest, "failed to validate request", err)
+		return
+	}
+
+	match, err := matchAsModel(body0)
+	if err != nil {
+		l.Error("Failed to convert request to model", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusBadRequest, "failed to convert request to model", err)
+		return
+	}
+
+	homePartnership, err := s.partnershipAsModel(body0.HomeTeam.Partnership)
+	if err != nil {
+		l.Error("Failed to get home partnership", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to get home partnership", err)
+		return
+	}
+
+	if err := s.r.SavePartnership(homePartnership); err != nil {
+		l.Error("Failed to save home partnership", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to save home partnership", err)
+		return
+	}
+
+	awayPartnership, err := s.partnershipAsModel(body0.AwayTeam.Partnership)
+	if err != nil {
+		l.Error("Failed to get away partnership", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to get away partnership", err)
+		return
+	}
+
+	if err := s.r.SavePartnership(awayPartnership); err != nil {
+		l.Error("Failed to save away partnership", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to save away partnership", err)
+		return
+	}
+
+	match.HomePartnersId = homePartnership.Id
+	match.AwayPartnersId = awayPartnership.Id
+	if err := s.r.CreateMatch(match); err != nil {
+		l.Error("Failed to create match", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to create match", err)
+		return
+	}
+
+	homeScore := scoreAsModel(body0.HomeTeam.Scores)
+	if err := s.handleScore(homeScore, homePartnership.Id, match.Id); err != nil {
+		l.Error("Failed to handle home score", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to handle home score", err)
+		return
+	}
+
+	awayScore := scoreAsModel(body0.AwayTeam.Scores)
+	if err := s.handleScore(awayScore, awayPartnership.Id, match.Id); err != nil {
+		l.Error("Failed to handle away score", slog.String(logging.KeyError, err.Error()))
+		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to handle away score", err)
+		return
+	}
+}
+
+func (s *service) handleScore(score *models.Score, partnershipID int, matchID int) error {
+	score.PartnershipId = partnershipID
+	score.MatchId = matchID
+
+	if err := s.r.SaveScore(score); err != nil {
+		return fmt.Errorf("failed to save score: %w", err)
+	}
+
+	return nil
+}
+
+func scoreAsModel(s *api.Scores) *models.Score {
+	score := new(models.Score)
+
+	score.FirstSetScore = int(s.FirstSet)
+	score.SecondSetScore = int(s.SecondSet)
+
+	if s.ThirdSet != nil {
+		score.ThirdSetScore = *usql.NewNullInt64(*s.ThirdSet)
+	}
+
+	return score
+}
+
+func matchAsModel(m *api.CreateMatchJSONBody) (*models.Match, error) {
+	match := new(models.Match)
+
+	date, err := time.Parse(time.RFC3339, *m.MatchDate)
+	if err != nil {
+		return nil, fmt.Errorf("invalid match date: %w", err)
+	}
+	match.MatchDate = date
+
+	if m.Season == nil || m.Season.Id == nil {
+		return nil, errors.New("season is required")
+	}
+	match.SeasonId = int(*m.Season.Id)
+
+	switch *m.WinningTeam {
+	case api.WinningTeam_home:
+		match.WinningTeam = usql.NewEnum(models.MatchWinningTeamHome)
+	case api.WinningTeam_away:
+		match.WinningTeam = usql.NewEnum(models.MatchWinningTeamAway)
+	}
+
+	return match, nil
+}
+
+func (s *service) validateCreateMatch(body *api.CreateMatchJSONBody) error {
+	if body == nil {
+		return errors.New("request body is nil")
+	}
+
+	if body.Season == nil {
+		return errors.New("season is required")
+	} else if body.Season.Id == nil {
+		return errors.New("season id is required")
+	}
+
+	if body.MatchDate == nil {
+		return errors.New("match date is required")
+	} else if _, err := time.Parse(time.RFC3339, *body.MatchDate); err != nil {
+		return errors.New("invalid match date")
+	}
+
+	if body.HomeTeam == nil {
+		return errors.New("home team is required")
+	} else if body.HomeTeam.Partnership == nil {
+		return errors.New("home team partnership is required")
+	} else if body.AwayTeam.Partnership.Team == nil {
+		return errors.New("home team team is required")
+	} else if body.AwayTeam.Partnership.Team.Id == nil {
+		return errors.New("home team team id is required")
+	}
+
+	if body.HomeTeam.Partnership.PlayerA == nil {
+		return errors.New("home team player A is required")
+	} else if body.HomeTeam.Partnership.PlayerA.Id == nil {
+		return errors.New("home team player A id is required")
+	}
+
+	if body.HomeTeam.Partnership.PlayerB == nil {
+		return errors.New("home team player B is required")
+	} else if body.HomeTeam.Partnership.PlayerB.Id == nil {
+		return errors.New("home team player B id is required")
+	}
+
+	if body.HomeTeam.Scores == nil {
+		return errors.New("home team scores is required")
+	}
+
+	if body.AwayTeam == nil {
+		return errors.New("home team is required")
+	} else if body.AwayTeam.Partnership == nil {
+		return errors.New("home team partnership is required")
+	} else if body.AwayTeam.Partnership.Team == nil {
+		return errors.New("home team team is required")
+	} else if body.AwayTeam.Partnership.Team.Id == nil {
+		return errors.New("home team team id is required")
+	}
+
+	if body.AwayTeam.Partnership.PlayerA == nil {
+		return errors.New("home team player A is required")
+	} else if body.AwayTeam.Partnership.PlayerA.Id == nil {
+		return errors.New("home team player A id is required")
+	}
+
+	if body.AwayTeam.Partnership.PlayerB == nil {
+		return errors.New("home team player B is required")
+	} else if body.AwayTeam.Partnership.PlayerB.Id == nil {
+		return errors.New("home team player B id is required")
+	}
+
+	if body.AwayTeam.Scores == nil {
+		return errors.New("home team scores is required")
+	}
+
+	return nil
 }

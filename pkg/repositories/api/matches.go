@@ -103,3 +103,14 @@ func (r *repository) getMatchesFilters(got *GetMatchesFilters) *pagefilter.Multi
 
 	return mf
 }
+
+func (r *repository) CreateMatch(match *models.Match) error {
+	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("create_match"))
+	defer t.ObserveDuration()
+
+	if err := match.Insert(r.db); err != nil {
+		return fmt.Errorf("insert match: %w", err)
+	}
+
+	return nil
+}

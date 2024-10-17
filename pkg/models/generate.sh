@@ -44,6 +44,8 @@ if [ "$clean" = true ]; then
     gum style "Are you sure you want to remove all generated models?"
     gum confirm || exit 0
   fi
+
+  rm -f ./*.xo.go
 fi
 
 # If the -a flag is passed, generate all models

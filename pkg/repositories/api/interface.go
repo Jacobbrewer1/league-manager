@@ -50,4 +50,13 @@ type Repository interface {
 
 	// GetScoreByMatchAndPartnership gets a score by match and partnership.
 	GetScoreByMatchAndPartnership(matchID, partnershipID int64) (*models.Score, error)
+
+	// SavePartnership saves a partnership.
+	SavePartnership(partnership *models.Partnership) error
+
+	// SaveScore saves a score.
+	SaveScore(score *models.Score) error
+
+	// CreateMatch creates a match.
+	CreateMatch(match *models.Match) error
 }
