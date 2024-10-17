@@ -4,9 +4,11 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Jacobbrewer1/goschema/pkg/usql"
+	"github.com/Jacobbrewer1/patcher/inserter"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -54,16 +56,15 @@ func InsertManyGames(db DB, ms ...*Game) error {
 	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_many_Game"))
 	defer t.ObserveDuration()
 
-	var sqlstr = "INSERT INTO game (" +
-		"`season_id`,`home_partners_id`,`away_partners_id`,`match_date`,`winning_team`" +
-		") VALUES"
-
-	var args []interface{}
+	vals := make([]any, 0, len(ms))
 	for _, m := range ms {
-		sqlstr += " (" +
-			"?,?,?,?,?" +
-			"),"
-		args = append(args, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.WinningTeam)
+		// Dereference the pointer to get the struct value.
+		vals = append(vals, []any{*m})
+	}
+
+	sqlstr, args, err := inserter.NewBatch(vals, inserter.WithTable("game")).GenerateSQL()
+	if err != nil {
+		return fmt.Errorf("failed to create batch insert: %w", err)
 	}
 
 	DBLog(sqlstr, args...)
