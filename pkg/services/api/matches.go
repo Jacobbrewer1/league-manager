@@ -39,8 +39,8 @@ func (s *service) GetMatches(w http.ResponseWriter, r *http.Request, params api.
 	if err != nil {
 		switch {
 		case errors.Is(err, repo.ErrMatchNotFound):
-			matches = &pagefilter.PaginatedResponse[models.Match]{
-				Items: make([]*models.Match, 0),
+			matches = &pagefilter.PaginatedResponse[models.Game]{
+				Items: make([]*models.Game, 0),
 				Total: 0,
 			}
 		default:
@@ -57,7 +57,7 @@ func (s *service) GetMatches(w http.ResponseWriter, r *http.Request, params api.
 		respMatch.MatchDate = utils.Ptr(m.MatchDate.Format(time.RFC3339))
 
 		winningTeam := api.WinningTeam_home
-		if string(m.WinningTeam) == models.MatchWinningTeamAway {
+		if string(m.WinningTeam) == models.GameWinningTeamAway {
 			winningTeam = api.WinningTeam_away
 		}
 		respMatch.WinningTeam = &winningTeam
@@ -245,11 +245,13 @@ func (s *service) CreateMatch(w http.ResponseWriter, r *http.Request, body0 *api
 		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "failed to handle away score", err)
 		return
 	}
+
+	uhttp.SendMessageWithStatus(w, http.StatusCreated, "match created")
 }
 
 func (s *service) handleScore(score *models.Score, partnershipID int, matchID int) error {
 	score.PartnershipId = partnershipID
-	score.MatchId = matchID
+	score.GameId = matchID
 
 	if err := s.r.SaveScore(score); err != nil {
 		return fmt.Errorf("failed to save score: %w", err)
@@ -271,8 +273,8 @@ func scoreAsModel(s *api.Scores) *models.Score {
 	return score
 }
 
-func matchAsModel(m *api.CreateMatchJSONBody) (*models.Match, error) {
-	match := new(models.Match)
+func matchAsModel(m *api.CreateMatchJSONBody) (*models.Game, error) {
+	match := new(models.Game)
 
 	date, err := time.Parse(time.RFC3339, *m.MatchDate)
 	if err != nil {
@@ -287,9 +289,9 @@ func matchAsModel(m *api.CreateMatchJSONBody) (*models.Match, error) {
 
 	switch *m.WinningTeam {
 	case api.WinningTeam_home:
-		match.WinningTeam = usql.NewEnum(models.MatchWinningTeamHome)
+		match.WinningTeam = usql.NewEnum(models.GameWinningTeamHome)
 	case api.WinningTeam_away:
-		match.WinningTeam = usql.NewEnum(models.MatchWinningTeamAway)
+		match.WinningTeam = usql.NewEnum(models.GameWinningTeamAway)
 	}
 
 	return match, nil

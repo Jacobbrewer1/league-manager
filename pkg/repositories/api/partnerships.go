@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -24,7 +25,7 @@ func (r *repository) SavePartnership(partnership *models.Partnership) error {
 
 	// See if the partnership already exists
 	existingPartnership, err := models.PartnershipByPlayerAIdPlayerBIdTeamId(r.db, partnership.PlayerAId, partnership.PlayerBId, partnership.TeamId)
-	if err != nil {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return fmt.Errorf("error getting partnership: %w", err)
 	} else if existingPartnership != nil {
 		partnership.Id = existingPartnership.Id

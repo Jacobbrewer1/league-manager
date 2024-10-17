@@ -43,7 +43,7 @@ type Repository interface {
 	UpdateSeason(id int64, season *models.Season) error
 
 	// GetMatches gets a list of matches.
-	GetMatches(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Match], error)
+	GetMatches(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Game], error)
 
 	// GetPartnership gets a partnership by ID.
 	GetPartnership(id int64) (*models.Partnership, error)
@@ -58,5 +58,5 @@ type Repository interface {
 	SaveScore(score *models.Score) error
 
 	// CreateMatch creates a match.
-	CreateMatch(match *models.Match) error
+	CreateMatch(match *models.Game) error
 }

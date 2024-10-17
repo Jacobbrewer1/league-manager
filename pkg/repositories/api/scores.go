@@ -10,7 +10,7 @@ func (r *repository) GetScoreByMatchAndPartnership(matchID, partnershipID int64)
 	sqlStmt := `
 		SELECT id
 		FROM score s
-		WHERE s.match_id = ?
+		WHERE s.game_id = ?
 		AND s.partnership_id = ?
 	`
 
