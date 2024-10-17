@@ -9,7 +9,7 @@ github.com/Jacobbrewer1/goschema/pkg/usql
 ## explicit; go 1.23
 github.com/Jacobbrewer1/pagefilter
 github.com/Jacobbrewer1/pagefilter/common
-# github.com/Jacobbrewer1/patcher v0.1.4
+# github.com/Jacobbrewer1/patcher v0.1.5
 ## explicit; go 1.22
 github.com/Jacobbrewer1/patcher
 github.com/Jacobbrewer1/patcher/inserter

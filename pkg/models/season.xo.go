@@ -4,8 +4,10 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 
+	"github.com/Jacobbrewer1/patcher"
 	"github.com/Jacobbrewer1/patcher/inserter"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -104,6 +106,35 @@ func (m *Season) Update(db DB) error {
 		return err
 	} else if i <= 0 {
 		return ErrNoAffectedRows
+	}
+
+	return nil
+}
+
+func (m *Season) Patch(db DB, newT *Season) error {
+	if newT == nil {
+		return fmt.Errorf("new Season is nil")
+	}
+
+	res, err := patcher.NewDiffSQLPatch(m, newT, patcher.WithTable("season"))
+	if err != nil {
+		return fmt.Errorf("new diff sql patch: %w", err)
+	}
+
+	sqlstr, args, err := res.GenerateSQL()
+	if err != nil {
+		switch {
+		case errors.Is(err, patcher.ErrNoChanges):
+			return nil
+		default:
+			return fmt.Errorf("failed to create patch: %w", err)
+		}
+	}
+
+	DBLog(sqlstr, args...)
+	_, err = db.Exec(sqlstr, args...)
+	if err != nil {
+		return fmt.Errorf("failed to execute patch: %w", err)
 	}
 
 	return nil
