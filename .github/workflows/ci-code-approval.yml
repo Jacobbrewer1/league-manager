@@ -149,6 +149,7 @@ jobs:
         run: make codegen
 
       - name: "debug"
+        if: ${{ always() }}
         run: ls -la ./pkg/models
 
       - name: "fmt"
