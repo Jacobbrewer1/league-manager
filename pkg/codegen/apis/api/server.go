@@ -15,12 +15,12 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Get all matches
-	// (GET /matches)
-	GetMatches(w http.ResponseWriter, r *http.Request, params GetMatchesParams)
-	// Create a match
-	// (POST /matches)
-	CreateMatch(w http.ResponseWriter, r *http.Request, body0 *CreateMatchJSONBody)
+	// Get all games
+	// (GET /games)
+	GetGames(w http.ResponseWriter, r *http.Request, params GetGamesParams)
+	// Create a game
+	// (POST /games)
+	CreateGame(w http.ResponseWriter, r *http.Request, body0 *CreateGameJSONBody)
 	// Get all players
 	// (GET /players)
 	GetPlayers(w http.ResponseWriter, r *http.Request, params GetPlayersParams)
@@ -103,8 +103,8 @@ func WithMetricsMiddleware(middleware MetricsMiddlewareFunc) ServerOption {
 // ServerOption represents an optional feature applied to the server.
 type ServerOption func(s *ServerInterfaceWrapper)
 
-// GetMatches operation middleware
-func (siw *ServerInterfaceWrapper) GetMatches(w http.ResponseWriter, r *http.Request) {
+// GetGames operation middleware
+func (siw *ServerInterfaceWrapper) GetGames(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	cw := uhttp.NewResponseWriter(w,
 		uhttp.WithDefaultStatusCode(http.StatusOK),
@@ -121,7 +121,7 @@ func (siw *ServerInterfaceWrapper) GetMatches(w http.ResponseWriter, r *http.Req
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params GetMatchesParams
+	var params GetGamesParams
 
 	// ------------- Optional query parameter "limit" -------------
 
@@ -204,14 +204,14 @@ func (siw *ServerInterfaceWrapper) GetMatches(w http.ResponseWriter, r *http.Req
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.handler.GetMatches(w, r, params)
+		siw.handler.GetGames(w, r, params)
 	}))
 
 	handler.ServeHTTP(cw, r.WithContext(ctx))
 }
 
-// CreateMatch operation middleware
-func (siw *ServerInterfaceWrapper) CreateMatch(w http.ResponseWriter, r *http.Request) {
+// CreateGame operation middleware
+func (siw *ServerInterfaceWrapper) CreateGame(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	cw := uhttp.NewResponseWriter(w,
 		uhttp.WithDefaultStatusCode(http.StatusOK),
@@ -225,15 +225,15 @@ func (siw *ServerInterfaceWrapper) CreateMatch(w http.ResponseWriter, r *http.Re
 		}
 	}()
 
-	// ------------- Body parameter for CreateMatch for application/json ContentType -------------
-	body := new(CreateMatchJSONRequestBody)
+	// ------------- Body parameter for CreateGame for application/json ContentType -------------
+	body := new(CreateGameJSONRequestBody)
 	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
 		siw.errorHandlerFunc(cw, r, &UnmarshalingParamError{ParamName: "body", Err: err})
 		return
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.handler.CreateMatch(w, r, body)
+		siw.handler.CreateGame(w, r, body)
 	}))
 
 	handler.ServeHTTP(cw, r.WithContext(ctx))
@@ -894,8 +894,8 @@ func RegisterUnauthedHandlers(router *mux.Router, si ServerInterface, opts ...Se
 	router.Use(uhttp.AuthHeaderToContextMux())
 	router.Use(uhttp.GenerateOrCopyRequestIDMux())
 
-	router.Methods(http.MethodGet).Path("/matches").Handler(wrapHandler(wrapper.GetMatches))
-	router.Methods(http.MethodPost).Path("/matches").Handler(wrapHandler(wrapper.CreateMatch))
+	router.Methods(http.MethodGet).Path("/games").Handler(wrapHandler(wrapper.GetGames))
+	router.Methods(http.MethodPost).Path("/games").Handler(wrapHandler(wrapper.CreateGame))
 	router.Methods(http.MethodGet).Path("/players").Handler(wrapHandler(wrapper.GetPlayers))
 	router.Methods(http.MethodPost).Path("/players").Handler(wrapHandler(wrapper.CreatePlayer))
 	router.Methods(http.MethodGet).Path("/players/{id}").Handler(wrapHandler(wrapper.GetPlayerByID))

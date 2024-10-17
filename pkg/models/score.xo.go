@@ -192,7 +192,7 @@ func ScoreById(db DB, id int) (*Score, error) {
 
 // GetGameIdGame Gets an instance of Game
 //
-// Generated from constraint score_matches_id_fk
+// Generated from constraint score_games_id_fk
 func (m *Score) GetGameIdGame(db DB) (*Game, error) {
 	return GameById(db, m.GameId)
 }

@@ -18,7 +18,7 @@ import (
 	"github.com/Jacobbrewer1/uhttp"
 )
 
-func (s *service) GetMatches(w http.ResponseWriter, r *http.Request, params api.GetMatchesParams) {
+func (s *service) GetGames(w http.ResponseWriter, r *http.Request, params api.GetGamesParams) {
 	l := logging.LoggerFromRequest(r)
 
 	sortDir := new(common.SortDirection)
@@ -35,7 +35,7 @@ func (s *service) GetMatches(w http.ResponseWriter, r *http.Request, params api.
 		return
 	}
 
-	matches, err := s.r.GetMatches(paginationDetails, filts)
+	matches, err := s.r.GetGames(paginationDetails, filts)
 	if err != nil {
 		switch {
 		case errors.Is(err, repo.ErrMatchNotFound):
@@ -50,9 +50,9 @@ func (s *service) GetMatches(w http.ResponseWriter, r *http.Request, params api.
 		}
 	}
 
-	respMatches := make([]api.Match, 0, len(matches.Items))
+	respMatches := make([]api.Game, 0, len(matches.Items))
 	for _, m := range matches.Items {
-		respMatch := new(api.Match)
+		respMatch := new(api.Game)
 		respMatch.Id = utils.Ptr(int64(m.Id))
 		respMatch.MatchDate = utils.Ptr(m.MatchDate.Format(time.RFC3339))
 
@@ -125,9 +125,9 @@ func (s *service) GetMatches(w http.ResponseWriter, r *http.Request, params api.
 		respMatches = append(respMatches, *respMatch)
 	}
 
-	resp := &api.MatchesResponse{
-		Matches: respMatches,
-		Total:   matches.Total,
+	resp := &api.GamesResponse{
+		Games: respMatches,
+		Total: matches.Total,
 	}
 
 	if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {

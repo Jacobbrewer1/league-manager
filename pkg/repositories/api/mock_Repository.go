@@ -85,12 +85,12 @@ func (_m *MockRepository) CreateTeam(team *models.Team) error {
 	return r0
 }
 
-// GetMatches provides a mock function with given fields: details, filters
-func (_m *MockRepository) GetMatches(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Game], error) {
+// GetGames provides a mock function with given fields: details, filters
+func (_m *MockRepository) GetGames(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Game], error) {
 	ret := _m.Called(details, filters)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetMatches")
+		panic("no return value specified for GetGames")
 	}
 
 	var r0 *pagefilter.PaginatedResponse[models.Game]

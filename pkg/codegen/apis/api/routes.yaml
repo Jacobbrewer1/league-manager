@@ -455,12 +455,12 @@ paths:
               schema:
                 $ref: '../common/common.yaml#/components/schemas/error_message'
 
-  /matches:
+  /games:
     get:
       tags:
-        - matches
-      summary: Get all matches
-      operationId: getMatches
+        - games
+      summary: Get all games
+      operationId: getGames
       parameters:
         - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/limit_param'
         - $ref: '../../../../vendor/github.com/Jacobbrewer1/pagefilter/common/common.yaml#/components/parameters/last_value'
@@ -474,11 +474,11 @@ paths:
         - $ref: '#/components/parameters/query_team'
       responses:
         '200':
-          description: A list of matches
+          description: A list of games
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/matches_response'
+                $ref: '#/components/schemas/games_response'
         '400':
           description: Bad request
           content:
@@ -493,22 +493,22 @@ paths:
                 $ref: '../common/common.yaml#/components/schemas/error_message'
     post:
       tags:
-        - matches
-      summary: Create a match
-      operationId: createMatch
+        - games
+      summary: Create a game
+      operationId: createGame
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/match'
+              $ref: '#/components/schemas/game'
       responses:
         '201':
-          description: Match created
+          description: Game created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/match'
+                $ref: '../common/common.yaml#/components/schemas/message'
         '400':
           description: Bad request
           content:
@@ -677,21 +677,21 @@ components:
         name:
           type: string
 
-    matches_response:
+    games_response:
       type: object
       required:
-        - matches
+        - games
         - total
       properties:
-        matches:
+        games:
           type: array
           items:
-            $ref: '#/components/schemas/match'
+            $ref: '#/components/schemas/game'
         total:
           type: integer
           format: int64
 
-    match:
+    game:
       type: object
       properties:
         id:
@@ -700,9 +700,9 @@ components:
         season:
           $ref: '#/components/schemas/season'
         home_team:
-          $ref: '#/components/schemas/match_partnership'
+          $ref: '#/components/schemas/game_partnership'
         away_team:
-          $ref: '#/components/schemas/match_partnership'
+          $ref: '#/components/schemas/game_partnership'
         match_date:
           type: string
           format: datetime
@@ -719,7 +719,7 @@ components:
         team:
           $ref: '#/components/schemas/team'
 
-    match_partnership:
+    game_partnership:
       type: object
       properties:
         partnership:

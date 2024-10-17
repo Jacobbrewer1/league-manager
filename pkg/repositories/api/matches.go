@@ -19,7 +19,7 @@ var (
 	ErrDuplicateMatch = errors.New("match already exists")
 )
 
-func (r *repository) GetMatches(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Game], error) {
+func (r *repository) GetGames(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Game], error) {
 	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("get_matches"))
 	defer t.ObserveDuration()
 

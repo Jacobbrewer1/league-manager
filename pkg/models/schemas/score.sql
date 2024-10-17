@@ -7,7 +7,7 @@ create table score
     second_set_score int not null,
     third_set_score  int null,
     primary key (id),
-    constraint score_matches_id_fk
+    constraint score_games_id_fk
         foreign key (game_id) references game (id),
     constraint score_partnership_id_fk
         foreign key (partnership_id) references partnership (id)
