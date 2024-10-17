@@ -13,6 +13,24 @@ type MockRepository struct {
 	mock.Mock
 }
 
+// CreateMatch provides a mock function with given fields: match
+func (_m *MockRepository) CreateMatch(match *models.Game) error {
+	ret := _m.Called(match)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateMatch")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*models.Game) error); ok {
+		r0 = rf(match)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // CreatePlayer provides a mock function with given fields: player
 func (_m *MockRepository) CreatePlayer(player *models.Player) error {
 	ret := _m.Called(player)
@@ -67,24 +85,24 @@ func (_m *MockRepository) CreateTeam(team *models.Team) error {
 	return r0
 }
 
-// GetMatches provides a mock function with given fields: details, filters
-func (_m *MockRepository) GetMatches(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Match], error) {
+// GetGames provides a mock function with given fields: details, filters
+func (_m *MockRepository) GetGames(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Game], error) {
 	ret := _m.Called(details, filters)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetMatches")
+		panic("no return value specified for GetGames")
 	}
 
-	var r0 *pagefilter.PaginatedResponse[models.Match]
+	var r0 *pagefilter.PaginatedResponse[models.Game]
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Match], error)); ok {
+	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Game], error)); ok {
 		return rf(details, filters)
 	}
-	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetMatchesFilters) *pagefilter.PaginatedResponse[models.Match]); ok {
+	if rf, ok := ret.Get(0).(func(*pagefilter.PaginatorDetails, *GetMatchesFilters) *pagefilter.PaginatedResponse[models.Game]); ok {
 		r0 = rf(details, filters)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*pagefilter.PaginatedResponse[models.Match])
+			r0 = ret.Get(0).(*pagefilter.PaginatedResponse[models.Game])
 		}
 	}
 
@@ -335,6 +353,42 @@ func (_m *MockRepository) GetTeams(details *pagefilter.PaginatorDetails, filters
 	}
 
 	return r0, r1
+}
+
+// SavePartnership provides a mock function with given fields: partnership
+func (_m *MockRepository) SavePartnership(partnership *models.Partnership) error {
+	ret := _m.Called(partnership)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SavePartnership")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*models.Partnership) error); ok {
+		r0 = rf(partnership)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// SaveScore provides a mock function with given fields: score
+func (_m *MockRepository) SaveScore(score *models.Score) error {
+	ret := _m.Called(score)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SaveScore")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*models.Score) error); ok {
+		r0 = rf(score)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // UpdatePlayer provides a mock function with given fields: id, player

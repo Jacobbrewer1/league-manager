@@ -4,14 +4,17 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/Jacobbrewer1/goschema/pkg/usql"
+	"github.com/Jacobbrewer1/patcher/inserter"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Score represents a row from 'score'.
 type Score struct {
 	Id             int            `db:"id,autoinc,pk"`
-	MatchId        int            `db:"match_id"`
+	GameId         int            `db:"game_id"`
 	PartnershipId  int            `db:"partnership_id"`
 	FirstSetScore  int            `db:"first_set_score"`
 	SecondSetScore int            `db:"second_set_score"`
@@ -24,13 +27,13 @@ func (m *Score) Insert(db DB) error {
 	defer t.ObserveDuration()
 
 	const sqlstr = "INSERT INTO score (" +
-		"`match_id`, `partnership_id`, `first_set_score`, `second_set_score`, `third_set_score`" +
+		"`game_id`, `partnership_id`, `first_set_score`, `second_set_score`, `third_set_score`" +
 		") VALUES (" +
 		"?, ?, ?, ?, ?" +
 		")"
 
-	DBLog(sqlstr, m.MatchId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore)
-	res, err := db.Exec(sqlstr, m.MatchId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore)
+	DBLog(sqlstr, m.GameId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore)
+	res, err := db.Exec(sqlstr, m.GameId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore)
 	if err != nil {
 		return err
 	}
@@ -52,16 +55,15 @@ func InsertManyScores(db DB, ms ...*Score) error {
 	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_many_Score"))
 	defer t.ObserveDuration()
 
-	var sqlstr = "INSERT INTO score (" +
-		"`match_id`,`partnership_id`,`first_set_score`,`second_set_score`,`third_set_score`" +
-		") VALUES"
-
-	var args []interface{}
+	vals := make([]any, 0, len(ms))
 	for _, m := range ms {
-		sqlstr += " (" +
-			"?,?,?,?,?" +
-			"),"
-		args = append(args, m.MatchId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore)
+		// Dereference the pointer to get the struct value.
+		vals = append(vals, []any{*m})
+	}
+
+	sqlstr, args, err := inserter.NewBatch(vals, inserter.WithTable("score")).GenerateSQL()
+	if err != nil {
+		return fmt.Errorf("failed to create batch insert: %w", err)
 	}
 
 	DBLog(sqlstr, args...)
@@ -93,11 +95,11 @@ func (m *Score) Update(db DB) error {
 	defer t.ObserveDuration()
 
 	const sqlstr = "UPDATE score " +
-		"SET `match_id` = ?, `partnership_id` = ?, `first_set_score` = ?, `second_set_score` = ?, `third_set_score` = ? " +
+		"SET `game_id` = ?, `partnership_id` = ?, `first_set_score` = ?, `second_set_score` = ?, `third_set_score` = ? " +
 		"WHERE `id` = ?"
 
-	DBLog(sqlstr, m.MatchId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore, m.Id)
-	res, err := db.Exec(sqlstr, m.MatchId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore, m.Id)
+	DBLog(sqlstr, m.GameId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore, m.Id)
+	res, err := db.Exec(sqlstr, m.GameId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore, m.Id)
 	if err != nil {
 		return err
 	}
@@ -119,14 +121,14 @@ func (m *Score) InsertWithUpdate(db DB) error {
 	defer t.ObserveDuration()
 
 	const sqlstr = "INSERT INTO score (" +
-		"`match_id`, `partnership_id`, `first_set_score`, `second_set_score`, `third_set_score`" +
+		"`game_id`, `partnership_id`, `first_set_score`, `second_set_score`, `third_set_score`" +
 		") VALUES (" +
 		"?, ?, ?, ?, ?" +
 		") ON DUPLICATE KEY UPDATE " +
-		"`match_id` = VALUES(`match_id`), `partnership_id` = VALUES(`partnership_id`), `first_set_score` = VALUES(`first_set_score`), `second_set_score` = VALUES(`second_set_score`), `third_set_score` = VALUES(`third_set_score`)"
+		"`game_id` = VALUES(`game_id`), `partnership_id` = VALUES(`partnership_id`), `first_set_score` = VALUES(`first_set_score`), `second_set_score` = VALUES(`second_set_score`), `third_set_score` = VALUES(`third_set_score`)"
 
-	DBLog(sqlstr, m.MatchId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore)
-	res, err := db.Exec(sqlstr, m.MatchId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore)
+	DBLog(sqlstr, m.GameId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore)
+	res, err := db.Exec(sqlstr, m.GameId, m.PartnershipId, m.FirstSetScore, m.SecondSetScore, m.ThirdSetScore)
 	if err != nil {
 		return err
 	}
@@ -177,7 +179,7 @@ func ScoreById(db DB, id int) (*Score, error) {
 	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Score"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "SELECT `id`, `match_id`, `partnership_id`, `first_set_score`, `second_set_score`, `third_set_score` " +
+	const sqlstr = "SELECT `id`, `game_id`, `partnership_id`, `first_set_score`, `second_set_score`, `third_set_score` " +
 		"FROM score " +
 		"WHERE `id` = ?"
 
@@ -190,11 +192,11 @@ func ScoreById(db DB, id int) (*Score, error) {
 	return &m, nil
 }
 
-// GetMatchIdMatch Gets an instance of Match
+// GetGameIdGame Gets an instance of Game
 //
-// Generated from constraint score_matches_id_fk
-func (m *Score) GetMatchIdMatch(db DB) (*Match, error) {
-	return MatchById(db, m.MatchId)
+// Generated from constraint score_games_id_fk
+func (m *Score) GetGameIdGame(db DB) (*Game, error) {
+	return GameById(db, m.GameId)
 }
 
 // GetPartnershipIdPartnership Gets an instance of Partnership

@@ -8,26 +8,26 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-// Match defines the model for match.
-type Match struct {
-	AwayTeam    *MatchPartnership `json:"away_team,omitempty"`
-	HomeTeam    *MatchPartnership `json:"home_team,omitempty"`
-	Id          *int64            `json:"id,omitempty"`
-	MatchDate   *string           `json:"match_date,omitempty"`
-	Season      *Season           `json:"season,omitempty"`
-	WinningTeam *WinningTeam      `json:"winning_team,omitempty"`
+// Game defines the model for game.
+type Game struct {
+	AwayTeam    *GamePartnership `json:"away_team,omitempty"`
+	HomeTeam    *GamePartnership `json:"home_team,omitempty"`
+	Id          *int64           `json:"id,omitempty"`
+	MatchDate   *string          `json:"match_date,omitempty"`
+	Season      *Season          `json:"season,omitempty"`
+	WinningTeam *WinningTeam     `json:"winning_team,omitempty"`
 }
 
-// MatchPartnership defines the model for match_partnership.
-type MatchPartnership struct {
+// GamePartnership defines the model for game_partnership.
+type GamePartnership struct {
 	Partnership *Partnership `json:"partnership,omitempty"`
 	Scores      *Scores      `json:"scores,omitempty"`
 }
 
-// MatchesResponse defines the model for matches_response.
-type MatchesResponse struct {
-	Matches []Match `json:"matches"`
-	Total   int64   `json:"total"`
+// GamesResponse defines the model for games_response.
+type GamesResponse struct {
+	Games []Game `json:"games"`
+	Total int64  `json:"total"`
 }
 
 // Partnership defines the model for partnership.
@@ -54,8 +54,8 @@ type PlayersResponse struct {
 
 // Scores defines the model for scores.
 type Scores struct {
-	FirstSet  *int64 `json:"first_set,omitempty"`
-	SecondSet *int64 `json:"second_set,omitempty"`
+	FirstSet  int64  `json:"first_set"`
+	SecondSet int64  `json:"second_set"`
 	ThirdSet  *int64 `json:"third_set,omitempty"`
 }
 
@@ -115,8 +115,8 @@ type QueryTeam = string
 // QueryYear defines the model for query_year.
 type QueryYear = int64
 
-// GetMatchesParams defines parameters for GetMatches.
-type GetMatchesParams struct {
+// GetGamesParams defines parameters for GetGames.
+type GetGamesParams struct {
 	// Limit Report type
 	Limit *externalRef1.LimitParam `form:"limit,omitempty" json:"limit,omitempty"`
 
@@ -130,7 +130,7 @@ type GetMatchesParams struct {
 	SortBy *externalRef1.SortBy `form:"sort_by,omitempty" json:"sort_by,omitempty"`
 
 	// SortDir Pagination details, sorting order.
-	SortDir *GetMatchesParamsSortDir `form:"sort_dir,omitempty" json:"sort_dir,omitempty"`
+	SortDir *GetGamesParamsSortDir `form:"sort_dir,omitempty" json:"sort_dir,omitempty"`
 
 	// Date The date to filter by
 	Date *QueryDate `form:"date,omitempty" json:"date,omitempty"`
@@ -148,8 +148,8 @@ type GetMatchesParams struct {
 	Team *QueryTeam `form:"team,omitempty" json:"team,omitempty"`
 }
 
-// GetMatchesParamsSortDir defines parameters for GetMatches.
-type GetMatchesParamsSortDir string
+// GetGamesParamsSortDir defines parameters for GetGames.
+type GetGamesParamsSortDir string
 
 // GetPlayersParams defines parameters for GetPlayers.
 type GetPlayersParams struct {
@@ -226,11 +226,11 @@ type GetTeamsParams struct {
 // GetTeamsParamsSortDir defines parameters for GetTeams.
 type GetTeamsParamsSortDir string
 
-// CreateMatchJSONRequestBody defines body for CreateMatch for application/json ContentType.
-type CreateMatchJSONRequestBody = Match
+// CreateGameJSONRequestBody defines body for CreateGame for application/json ContentType.
+type CreateGameJSONRequestBody = Game
 
 // Temporary inclusion of type alias for backwards compatibility
-type CreateMatchJSONBody = Match
+type CreateGameJSONBody = Game
 
 // CreatePlayerJSONRequestBody defines body for CreatePlayer for application/json ContentType.
 type CreatePlayerJSONRequestBody = Player

@@ -4,14 +4,16 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Jacobbrewer1/goschema/pkg/usql"
+	"github.com/Jacobbrewer1/patcher/inserter"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// Match represents a row from 'match'.
-type Match struct {
+// Game represents a row from 'game'.
+type Game struct {
 	Id             int       `db:"id,autoinc,pk"`
 	SeasonId       int       `db:"season_id"`
 	HomePartnersId int       `db:"home_partners_id"`
@@ -20,12 +22,12 @@ type Match struct {
 	WinningTeam    usql.Enum `db:"winning_team"`
 }
 
-// Insert inserts the Match to the database.
-func (m *Match) Insert(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Match"))
+// Insert inserts the Game to the database.
+func (m *Game) Insert(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Game"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "INSERT INTO match (" +
+	const sqlstr = "INSERT INTO game (" +
 		"`season_id`, `home_partners_id`, `away_partners_id`, `match_date`, `winning_team`" +
 		") VALUES (" +
 		"?, ?, ?, ?, ?" +
@@ -46,24 +48,23 @@ func (m *Match) Insert(db DB) error {
 	return nil
 }
 
-func InsertManyMatchs(db DB, ms ...*Match) error {
+func InsertManyGames(db DB, ms ...*Game) error {
 	if len(ms) == 0 {
 		return nil
 	}
 
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_many_Match"))
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_many_Game"))
 	defer t.ObserveDuration()
 
-	var sqlstr = "INSERT INTO match (" +
-		"`season_id`,`home_partners_id`,`away_partners_id`,`match_date`,`winning_team`" +
-		") VALUES"
-
-	var args []interface{}
+	vals := make([]any, 0, len(ms))
 	for _, m := range ms {
-		sqlstr += " (" +
-			"?,?,?,?,?" +
-			"),"
-		args = append(args, m.SeasonId, m.HomePartnersId, m.AwayPartnersId, m.MatchDate, m.WinningTeam)
+		// Dereference the pointer to get the struct value.
+		vals = append(vals, []any{*m})
+	}
+
+	sqlstr, args, err := inserter.NewBatch(vals, inserter.WithTable("game")).GenerateSQL()
+	if err != nil {
+		return fmt.Errorf("failed to create batch insert: %w", err)
 	}
 
 	DBLog(sqlstr, args...)
@@ -85,16 +86,16 @@ func InsertManyMatchs(db DB, ms ...*Match) error {
 }
 
 // IsPrimaryKeySet returns true if all primary key fields are set to none zero values
-func (m *Match) IsPrimaryKeySet() bool {
+func (m *Game) IsPrimaryKeySet() bool {
 	return IsKeySet(m.Id)
 }
 
-// Update updates the Match in the database.
-func (m *Match) Update(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("update_Match"))
+// Update updates the Game in the database.
+func (m *Game) Update(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("update_Game"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "UPDATE match " +
+	const sqlstr = "UPDATE game " +
 		"SET `season_id` = ?, `home_partners_id` = ?, `away_partners_id` = ?, `match_date` = ?, `winning_team` = ? " +
 		"WHERE `id` = ?"
 
@@ -114,13 +115,13 @@ func (m *Match) Update(db DB) error {
 	return nil
 }
 
-// InsertWithUpdate inserts the Match to the database, and tries to update
+// InsertWithUpdate inserts the Game to the database, and tries to update
 // on unique constraint violations.
-func (m *Match) InsertWithUpdate(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_update_Match"))
+func (m *Game) InsertWithUpdate(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_update_Game"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "INSERT INTO match (" +
+	const sqlstr = "INSERT INTO game (" +
 		"`season_id`, `home_partners_id`, `away_partners_id`, `match_date`, `winning_team`" +
 		") VALUES (" +
 		"?, ?, ?, ?, ?" +
@@ -142,29 +143,29 @@ func (m *Match) InsertWithUpdate(db DB) error {
 	return nil
 }
 
-// Save saves the Match to the database.
-func (m *Match) Save(db DB) error {
+// Save saves the Game to the database.
+func (m *Game) Save(db DB) error {
 	if m.IsPrimaryKeySet() {
 		return m.Update(db)
 	}
 	return m.Insert(db)
 }
 
-// SaveOrUpdate saves the Match to the database, but tries to update
+// SaveOrUpdate saves the Game to the database, but tries to update
 // on unique constraint violations.
-func (m *Match) SaveOrUpdate(db DB) error {
+func (m *Game) SaveOrUpdate(db DB) error {
 	if m.IsPrimaryKeySet() {
 		return m.Update(db)
 	}
 	return m.InsertWithUpdate(db)
 }
 
-// Delete deletes the Match from the database.
-func (m *Match) Delete(db DB) error {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("delete_Match"))
+// Delete deletes the Game from the database.
+func (m *Game) Delete(db DB) error {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("delete_Game"))
 	defer t.ObserveDuration()
 
-	const sqlstr = "DELETE FROM match WHERE `id` = ?"
+	const sqlstr = "DELETE FROM game WHERE `id` = ?"
 
 	DBLog(sqlstr, m.Id)
 	_, err := db.Exec(sqlstr, m.Id)
@@ -172,19 +173,19 @@ func (m *Match) Delete(db DB) error {
 	return err
 }
 
-// MatchById retrieves a row from 'match' as a Match.
+// GameById retrieves a row from 'game' as a Game.
 //
 // Generated from primary key.
-func MatchById(db DB, id int) (*Match, error) {
-	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Match"))
+func GameById(db DB, id int) (*Game, error) {
+	t := prometheus.NewTimer(DatabaseLatency.WithLabelValues("insert_Game"))
 	defer t.ObserveDuration()
 
 	const sqlstr = "SELECT `id`, `season_id`, `home_partners_id`, `away_partners_id`, `match_date`, `winning_team` " +
-		"FROM match " +
+		"FROM game " +
 		"WHERE `id` = ?"
 
 	DBLog(sqlstr, id)
-	var m Match
+	var m Game
 	if err := db.Get(&m, sqlstr, id); err != nil {
 		return nil, err
 	}
@@ -194,27 +195,27 @@ func MatchById(db DB, id int) (*Match, error) {
 
 // GetSeasonIdSeason Gets an instance of Season
 //
-// Generated from constraint match_season_id_fk
-func (m *Match) GetSeasonIdSeason(db DB) (*Season, error) {
+// Generated from constraint game_season_id_fk
+func (m *Game) GetSeasonIdSeason(db DB) (*Season, error) {
 	return SeasonById(db, m.SeasonId)
 }
 
 // GetHomePartnersIdPartnership Gets an instance of Partnership
 //
-// Generated from constraint matches_partnership_id_fk
-func (m *Match) GetHomePartnersIdPartnership(db DB) (*Partnership, error) {
+// Generated from constraint game_partnership_id_fk
+func (m *Game) GetHomePartnersIdPartnership(db DB) (*Partnership, error) {
 	return PartnershipById(db, m.HomePartnersId)
 }
 
 // GetAwayPartnersIdPartnership Gets an instance of Partnership
 //
-// Generated from constraint matches_partnership_id_fk2
-func (m *Match) GetAwayPartnersIdPartnership(db DB) (*Partnership, error) {
+// Generated from constraint game_partnership_id_fk2
+func (m *Game) GetAwayPartnersIdPartnership(db DB) (*Partnership, error) {
 	return PartnershipById(db, m.AwayPartnersId)
 }
 
 // Valid values for the 'WinningTeam' enum column
 var (
-	MatchWinningTeamHome = "HOME"
-	MatchWinningTeamAway = "AWAY"
+	GameWinningTeamHome = "HOME"
+	GameWinningTeamAway = "AWAY"
 )

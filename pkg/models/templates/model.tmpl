@@ -10,6 +10,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/Jacobbrewer1/goschema/pkg/usql"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/Jacobbrewer1/patcher/inserter"
 )
 {{ with .Table }}
 {{ $struct := .Name | structify }}

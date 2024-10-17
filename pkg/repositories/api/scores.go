@@ -10,7 +10,7 @@ func (r *repository) GetScoreByMatchAndPartnership(matchID, partnershipID int64)
 	sqlStmt := `
 		SELECT id
 		FROM score s
-		WHERE s.match_id = ?
+		WHERE s.game_id = ?
 		AND s.partnership_id = ?
 	`
 
@@ -25,4 +25,12 @@ func (r *repository) GetScoreByMatchAndPartnership(matchID, partnershipID int64)
 	}
 
 	return score, nil
+}
+
+func (r *repository) SaveScore(score *models.Score) error {
+	if err := score.Save(r.db); err != nil {
+		return fmt.Errorf("error saving score: %w", err)
+	}
+
+	return nil
 }

@@ -90,13 +90,13 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// GetMatches request
-	GetMatches(ctx context.Context, params *GetMatchesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetGames request
+	GetGames(ctx context.Context, params *GetGamesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateMatchWithBody request with any body
-	CreateMatchWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateGameWithBody request with any body
+	CreateGameWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateMatch(ctx context.Context, body CreateMatchJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateGame(ctx context.Context, body CreateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetPlayers request
 	GetPlayers(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -147,8 +147,8 @@ type ClientInterface interface {
 	UpdateTeam(ctx context.Context, id int64, body UpdateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetMatches(ctx context.Context, params *GetMatchesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetMatchesRequest(c.Server, params)
+func (c *Client) GetGames(ctx context.Context, params *GetGamesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetGamesRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -159,8 +159,8 @@ func (c *Client) GetMatches(ctx context.Context, params *GetMatchesParams, reqEd
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateMatchWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateMatchRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateGameWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateGameRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +171,8 @@ func (c *Client) CreateMatchWithBody(ctx context.Context, contentType string, bo
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateMatch(ctx context.Context, body CreateMatchJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateMatchRequest(c.Server, body)
+func (c *Client) CreateGame(ctx context.Context, body CreateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateGameRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -399,8 +399,8 @@ func (c *Client) UpdateTeam(ctx context.Context, id int64, body UpdateTeamJSONRe
 	return c.Client.Do(req)
 }
 
-// NewGetMatchesRequest generates requests for GetMatches
-func NewGetMatchesRequest(server string, params *GetMatchesParams) (*http.Request, error) {
+// NewGetGamesRequest generates requests for GetGames
+func NewGetGamesRequest(server string, params *GetGamesParams) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -408,7 +408,7 @@ func NewGetMatchesRequest(server string, params *GetMatchesParams) (*http.Reques
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/matches")
+	operationPath := fmt.Sprintf("/games")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -592,19 +592,19 @@ func NewGetMatchesRequest(server string, params *GetMatchesParams) (*http.Reques
 	return req, nil
 }
 
-// NewCreateMatchRequest calls the generic CreateMatch builder with application/json body
-func NewCreateMatchRequest(server string, body CreateMatchJSONRequestBody) (*http.Request, error) {
+// NewCreateGameRequest calls the generic CreateGame builder with application/json body
+func NewCreateGameRequest(server string, body CreateGameJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateMatchRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateGameRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewCreateMatchRequestWithBody generates requests for CreateMatch with any type of body
-func NewCreateMatchRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateGameRequestWithBody generates requests for CreateGame with any type of body
+func NewCreateGameRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -612,7 +612,7 @@ func NewCreateMatchRequestWithBody(server string, contentType string, body io.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/matches")
+	operationPath := fmt.Sprintf("/games")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1441,13 +1441,13 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetMatchesWithResponse request
-	GetMatchesWithResponse(ctx context.Context, params *GetMatchesParams, reqEditors ...RequestEditorFn) (*GetMatchesResponse, error)
+	// GetGamesWithResponse request
+	GetGamesWithResponse(ctx context.Context, params *GetGamesParams, reqEditors ...RequestEditorFn) (*GetGamesResponse, error)
 
-	// CreateMatchWithBodyWithResponse request with any body
-	CreateMatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateMatchResponse, error)
+	// CreateGameWithBodyWithResponse request with any body
+	CreateGameWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateGameResponse, error)
 
-	CreateMatchWithResponse(ctx context.Context, body CreateMatchJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateMatchResponse, error)
+	CreateGameWithResponse(ctx context.Context, body CreateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateGameResponse, error)
 
 	// GetPlayersWithResponse request
 	GetPlayersWithResponse(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*GetPlayersResponse, error)
@@ -1498,16 +1498,16 @@ type ClientWithResponsesInterface interface {
 	UpdateTeamWithResponse(ctx context.Context, id int64, body UpdateTeamJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateTeamResponse, error)
 }
 
-type GetMatchesResponse struct {
+type GetGamesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *MatchesResponse
+	JSON200      *GamesResponse
 	JSON400      *externalRef0.ErrorMessage
 	JSON500      *externalRef0.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
-func (r GetMatchesResponse) Status() string {
+func (r GetGamesResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1515,23 +1515,23 @@ func (r GetMatchesResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetMatchesResponse) StatusCode() int {
+func (r GetGamesResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CreateMatchResponse struct {
+type CreateGameResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *Match
+	JSON201      *externalRef0.Message
 	JSON400      *externalRef0.ErrorMessage
 	JSON500      *externalRef0.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
-func (r CreateMatchResponse) Status() string {
+func (r CreateGameResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1539,7 +1539,7 @@ func (r CreateMatchResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CreateMatchResponse) StatusCode() int {
+func (r CreateGameResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1840,30 +1840,30 @@ func (r UpdateTeamResponse) StatusCode() int {
 	return 0
 }
 
-// GetMatchesWithResponse request returning *GetMatchesResponse
-func (c *ClientWithResponses) GetMatchesWithResponse(ctx context.Context, params *GetMatchesParams, reqEditors ...RequestEditorFn) (*GetMatchesResponse, error) {
-	rsp, err := c.GetMatches(ctx, params, reqEditors...)
+// GetGamesWithResponse request returning *GetGamesResponse
+func (c *ClientWithResponses) GetGamesWithResponse(ctx context.Context, params *GetGamesParams, reqEditors ...RequestEditorFn) (*GetGamesResponse, error) {
+	rsp, err := c.GetGames(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetMatchesResponse(rsp)
+	return ParseGetGamesResponse(rsp)
 }
 
-// CreateMatchWithBodyWithResponse request with arbitrary body returning *CreateMatchResponse
-func (c *ClientWithResponses) CreateMatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateMatchResponse, error) {
-	rsp, err := c.CreateMatchWithBody(ctx, contentType, body, reqEditors...)
+// CreateGameWithBodyWithResponse request with arbitrary body returning *CreateGameResponse
+func (c *ClientWithResponses) CreateGameWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateGameResponse, error) {
+	rsp, err := c.CreateGameWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseCreateMatchResponse(rsp)
+	return ParseCreateGameResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateMatchWithResponse(ctx context.Context, body CreateMatchJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateMatchResponse, error) {
-	rsp, err := c.CreateMatch(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateGameWithResponse(ctx context.Context, body CreateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateGameResponse, error) {
+	rsp, err := c.CreateGame(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseCreateMatchResponse(rsp)
+	return ParseCreateGameResponse(rsp)
 }
 
 // GetPlayersWithResponse request returning *GetPlayersResponse
@@ -2022,22 +2022,22 @@ func (c *ClientWithResponses) UpdateTeamWithResponse(ctx context.Context, id int
 	return ParseUpdateTeamResponse(rsp)
 }
 
-// ParseGetMatchesResponse parses an HTTP response from a GetMatchesWithResponse call
-func ParseGetMatchesResponse(rsp *http.Response) (*GetMatchesResponse, error) {
+// ParseGetGamesResponse parses an HTTP response from a GetGamesWithResponse call
+func ParseGetGamesResponse(rsp *http.Response) (*GetGamesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetMatchesResponse{
+	response := &GetGamesResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest MatchesResponse
+		var dest GamesResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2062,22 +2062,22 @@ func ParseGetMatchesResponse(rsp *http.Response) (*GetMatchesResponse, error) {
 	return response, nil
 }
 
-// ParseCreateMatchResponse parses an HTTP response from a CreateMatchWithResponse call
-func ParseCreateMatchResponse(rsp *http.Response) (*CreateMatchResponse, error) {
+// ParseCreateGameResponse parses an HTTP response from a CreateGameWithResponse call
+func ParseCreateGameResponse(rsp *http.Response) (*CreateGameResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateMatchResponse{
+	response := &CreateGameResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest Match
+		var dest externalRef0.Message
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

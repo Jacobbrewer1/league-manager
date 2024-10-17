@@ -19,7 +19,7 @@ var (
 	ErrDuplicateMatch = errors.New("match already exists")
 )
 
-func (r *repository) GetMatches(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Match], error) {
+func (r *repository) GetGames(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Game], error) {
 	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("get_matches"))
 	defer t.ObserveDuration()
 
@@ -46,7 +46,7 @@ func (r *repository) GetMatches(details *pagefilter.PaginatorDetails, filters *G
 		}
 	}
 
-	items := make([]*models.Match, 0)
+	items := make([]*models.Game, 0)
 	if err := pg.Retrieve(pvt, &items); err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -66,7 +66,7 @@ func (r *repository) GetMatches(details *pagefilter.PaginatorDetails, filters *G
 		}
 	}
 
-	return &pagefilter.PaginatedResponse[models.Match]{
+	return &pagefilter.PaginatedResponse[models.Game]{
 		Items: items,
 		Total: total,
 	}, nil
@@ -102,4 +102,15 @@ func (r *repository) getMatchesFilters(got *GetMatchesFilters) *pagefilter.Multi
 	}
 
 	return mf
+}
+
+func (r *repository) CreateMatch(match *models.Game) error {
+	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("create_match"))
+	defer t.ObserveDuration()
+
+	if err := match.Insert(r.db); err != nil {
+		return fmt.Errorf("insert match: %w", err)
+	}
+
+	return nil
 }

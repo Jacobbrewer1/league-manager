@@ -48,7 +48,7 @@ create table partnership
         foreign key (team_id) references team (id)
 );
 
-create table `match`
+create table game
 (
     id               int auto_increment
         primary key,
@@ -56,11 +56,12 @@ create table `match`
     home_partners_id int      not null,
     away_partners_id int      not null,
     match_date       datetime not null,
-    constraint match_season_id_fk
+    winning_team     enum ('HOME', 'AWAY') not null,
+    constraint game_season_id_fk
         foreign key (season_id) references season (id),
-    constraint matches_partnership_id_fk
+    constraint games_partnership_id_fk
         foreign key (home_partners_id) references partnership (id),
-    constraint matches_partnership_id_fk2
+    constraint games_partnership_id_fk2
         foreign key (away_partners_id) references partnership (id)
 );
 
@@ -68,13 +69,13 @@ create table score
 (
     id               int auto_increment
         primary key,
-    match_id         int not null,
+    game_id         int not null,
     partnership_id   int not null,
     first_set_score  int not null,
     second_set_score int not null,
     third_set_score  int null,
-    constraint score_matches_id_fk
-        foreign key (match_id) references `match` (id),
+    constraint score_games_id_fk
+        foreign key (game_id) references game (id),
     constraint score_partnership_id_fk
         foreign key (partnership_id) references partnership (id)
 );
