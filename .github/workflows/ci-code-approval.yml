@@ -148,6 +148,9 @@ jobs:
       - name: "Run Code Generation"
         run: make codegen
 
+      - name: "debug"
+        run: ls -la ./pkg/models
+
       - name: "fmt"
         run: go fmt ./...
 
