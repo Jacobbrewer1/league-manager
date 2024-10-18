@@ -53,4 +53,13 @@ jobs:
         run: |
           export CGO_ENABLED=0
           chmod +x ./docker_build.sh
-          ./docker_build.sh -f ${{ if github.event.inputs.app == 'build-all' }}-a${{ else }}-b ${{ github.event.inputs.app }}${{ endif }} ${{ if github.event.inputs.push == true }}-p${{ endif }}
+          FLAGS="-f"
+          if [ "${{ github.event.inputs.app }}" == "build-all" ]; then
+            FLAGS="$FLAGS -a"
+          else
+            FLAGS="$FLAGS -b ${{ github.event.inputs.app }}"
+          fi
+          if [ "${{ github.event.inputs.push }}" == "true" ]; then
+            FLAGS="$FLAGS -p"
+          fi
+          ./docker_build.sh $FLAGS
