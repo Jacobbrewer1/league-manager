@@ -23,7 +23,7 @@ while getopts 'abfp' flag; do
       print_usage
       exit 1
     fi
-    shift
+    shift $((OPTIND - 1))
     buildApp="$1"
     ;;
   f)
