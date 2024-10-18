@@ -68,7 +68,12 @@ function handle_subdirectory() {
   gum style --foreground 10 "Building docker image for $appName"
   registry="ghcr.io/jacobbrewer1/league-manager-$appName"
 
-  gum spin --spinner dot --title "Building image" -- docker build -t "$registry:$hash" -t "$registry:latest" . || fail "Unable to build docker image for $appName"
+  if [ "$forced" == true ]; then
+    gum style --foreground 10 "Forcing build"
+    docker build -t "$registry:$hash" -t "$registry:latest" . || fail "Unable to build docker image for $appName"
+  else
+    gum spin --spinner dot --title "Building image" -- docker build -t "$registry:$hash" -t "$registry:latest" . || fail "Unable to build docker image for $appName"
+  fi
 
   if [ "$forced" == false ]; then
     gum style --foreground 10 "Would you like to push the docker image to the GitHub Container Registry?"
