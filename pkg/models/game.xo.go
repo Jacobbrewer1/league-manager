@@ -119,7 +119,7 @@ func (m *Game) Update(db DB) error {
 
 func (m *Game) Patch(db DB, newT *Game) error {
 	if newT == nil {
-		return fmt.Errorf("new Game is nil")
+		return errors.New("new game is nil")
 	}
 
 	res, err := patcher.NewDiffSQLPatch(m, newT, patcher.WithTable("game"))

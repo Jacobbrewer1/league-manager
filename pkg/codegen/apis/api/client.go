@@ -13,7 +13,7 @@ import (
 	"net/url"
 	"strings"
 
-	externalRef0 "github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/common"
+	externalRef1 "github.com/Jacobbrewer1/uhttp/common"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -1502,8 +1502,8 @@ type GetGamesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *GamesResponse
-	JSON400      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1525,9 +1525,9 @@ func (r GetGamesResponse) StatusCode() int {
 type CreateGameResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *externalRef0.Message
-	JSON400      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON201      *externalRef1.Message
+	JSON400      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1550,8 +1550,8 @@ type GetPlayersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *PlayersResponse
-	JSON400      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1574,8 +1574,8 @@ type CreatePlayerResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *Player
-	JSON400      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1598,9 +1598,9 @@ type GetPlayerByIDResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Player
-	JSON400      *externalRef0.ErrorMessage
-	JSON404      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1623,9 +1623,9 @@ type UpdatePlayerResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Player
-	JSON400      *externalRef0.ErrorMessage
-	JSON404      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1648,8 +1648,8 @@ type GetSeasonsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *SeasonsResponse
-	JSON400      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1672,8 +1672,8 @@ type CreateSeasonResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *Season
-	JSON400      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1696,9 +1696,9 @@ type GetSeasonByIDResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Season
-	JSON400      *externalRef0.ErrorMessage
-	JSON404      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1721,9 +1721,9 @@ type UpdateSeasonResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Season
-	JSON400      *externalRef0.ErrorMessage
-	JSON404      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1746,8 +1746,8 @@ type GetTeamsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *TeamsResponse
-	JSON400      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1770,8 +1770,8 @@ type CreateTeamResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *Team
-	JSON400      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1794,9 +1794,9 @@ type GetTeamByIDResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Team
-	JSON400      *externalRef0.ErrorMessage
-	JSON404      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -1819,9 +1819,9 @@ type UpdateTeamResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Team
-	JSON400      *externalRef0.ErrorMessage
-	JSON404      *externalRef0.ErrorMessage
-	JSON500      *externalRef0.ErrorMessage
+	JSON400      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.ErrorMessage
+	JSON500      *externalRef1.ErrorMessage
 }
 
 // Status returns HTTPResponse.Status
@@ -2044,14 +2044,14 @@ func ParseGetGamesResponse(rsp *http.Response) (*GetGamesResponse, error) {
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2077,21 +2077,21 @@ func ParseCreateGameResponse(rsp *http.Response) (*CreateGameResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest externalRef0.Message
+		var dest externalRef1.Message
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2124,14 +2124,14 @@ func ParseGetPlayersResponse(rsp *http.Response) (*GetPlayersResponse, error) {
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2164,14 +2164,14 @@ func ParseCreatePlayerResponse(rsp *http.Response) (*CreatePlayerResponse, error
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2204,21 +2204,21 @@ func ParseGetPlayerByIDResponse(rsp *http.Response) (*GetPlayerByIDResponse, err
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2251,21 +2251,21 @@ func ParseUpdatePlayerResponse(rsp *http.Response) (*UpdatePlayerResponse, error
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2298,14 +2298,14 @@ func ParseGetSeasonsResponse(rsp *http.Response) (*GetSeasonsResponse, error) {
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2338,14 +2338,14 @@ func ParseCreateSeasonResponse(rsp *http.Response) (*CreateSeasonResponse, error
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2378,21 +2378,21 @@ func ParseGetSeasonByIDResponse(rsp *http.Response) (*GetSeasonByIDResponse, err
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2425,21 +2425,21 @@ func ParseUpdateSeasonResponse(rsp *http.Response) (*UpdateSeasonResponse, error
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2472,14 +2472,14 @@ func ParseGetTeamsResponse(rsp *http.Response) (*GetTeamsResponse, error) {
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2512,14 +2512,14 @@ func ParseCreateTeamResponse(rsp *http.Response) (*CreateTeamResponse, error) {
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2552,21 +2552,21 @@ func ParseGetTeamByIDResponse(rsp *http.Response) (*GetTeamByIDResponse, error) 
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2599,21 +2599,21 @@ func ParseUpdateTeamResponse(rsp *http.Response) (*UpdateTeamResponse, error) {
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest externalRef0.ErrorMessage
+		var dest externalRef1.ErrorMessage
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

@@ -113,7 +113,7 @@ func (m *Season) Update(db DB) error {
 
 func (m *Season) Patch(db DB, newT *Season) error {
 	if newT == nil {
-		return fmt.Errorf("new Season is nil")
+		return errors.New("new season is nil")
 	}
 
 	res, err := patcher.NewDiffSQLPatch(m, newT, patcher.WithTable("season"))

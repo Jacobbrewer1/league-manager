@@ -118,7 +118,7 @@ func (m *Player) Update(db DB) error {
 
 func (m *Player) Patch(db DB, newT *Player) error {
 	if newT == nil {
-		return fmt.Errorf("new Player is nil")
+		return errors.New("new player is nil")
 	}
 
 	res, err := patcher.NewDiffSQLPatch(m, newT, patcher.WithTable("player"))
