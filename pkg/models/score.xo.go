@@ -118,7 +118,7 @@ func (m *Score) Update(db DB) error {
 
 func (m *Score) Patch(db DB, newT *Score) error {
 	if newT == nil {
-		return fmt.Errorf("new Score is nil")
+		return errors.New("new score is nil")
 	}
 
 	res, err := patcher.NewDiffSQLPatch(m, newT, patcher.WithTable("score"))

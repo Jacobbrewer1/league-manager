@@ -39,13 +39,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
     post:
       tags:
         - players
@@ -69,13 +69,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
 
   /players/{id}:
     get:
@@ -103,19 +103,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '404':
           description: Player not found
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
     patch:
       tags:
         - players
@@ -147,19 +147,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '404':
           description: Player not found
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
 
   /teams:
     get:
@@ -186,13 +186,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
     post:
       tags:
         - teams
@@ -216,13 +216,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
 
   /teams/{id}:
     get:
@@ -250,19 +250,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '404':
           description: Team not found
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
     patch:
       tags:
         - teams
@@ -294,19 +294,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '404':
           description: Team not found
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
 
   /seasons:
     get:
@@ -333,13 +333,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
     post:
       tags:
         - seasons
@@ -363,13 +363,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
 
   /seasons/{id}:
     get:
@@ -397,19 +397,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '404':
           description: Season not found
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
     patch:
       tags:
         - seasons
@@ -441,19 +441,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '404':
           description: Season not found
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
 
   /games:
     get:
@@ -484,13 +484,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
     post:
       tags:
         - games
@@ -508,19 +508,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/message'
         '400':
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '../common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/Jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
 
 components:
   parameters:
