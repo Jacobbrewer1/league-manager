@@ -5,6 +5,7 @@ package {{ .OutputDir | base | snakecase }}
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/go-sql-driver/mysql"

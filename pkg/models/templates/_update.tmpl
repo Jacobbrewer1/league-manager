@@ -29,7 +29,7 @@ func (m *{{ $struct }}) Update(db DB) error {
 
 func (m *{{ $struct }}) Patch(db DB, newT *{{ $struct }}) error {
     if newT == nil {
-        return fmt.Errorf("new {{ $struct }} is nil")
+        return errors.New("new {{ .Name }} is nil")
     }
 
 	res, err := patcher.NewDiffSQLPatch(m, newT, patcher.WithTable("{{ .Name }}"))
