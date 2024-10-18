@@ -25,7 +25,7 @@ func (r *repository) GetGames(details *pagefilter.PaginatorDetails, filters *Get
 
 	mf := r.getMatchesFilters(filters)
 
-	pg := pagefilter.NewPaginator(r.db, "`match`", "id", mf)
+	pg := pagefilter.NewPaginator(r.db, "game", "id", mf)
 
 	if err := pg.SetDetails(details, "id", "name"); err != nil {
 		switch {
