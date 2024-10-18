@@ -53,4 +53,4 @@ jobs:
         run: |
           export CGO_ENABLED=0
           chmod +x ./docker_build.sh
-          ./docker_build.sh ${{ inputs.app }} ${{ inputs.push }}
+          ./docker_build.sh -f ${{ if github.event.inputs.app == 'build-all' }}-a${{ else }}-b ${{ github.event.inputs.app }}${{ endif }} ${{ if github.event.inputs.push == true }}-p${{ endif }}
