@@ -40,6 +40,13 @@ jobs:
           go-version: ${{ vars.GO_VERSION }}
           cache-dependency-path: "**/*.sum"
 
+      - name: Install GUM
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
+          sudo apt update && sudo apt install gum
+
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into registry
@@ -53,4 +60,13 @@ jobs:
         run: |
           export CGO_ENABLED=0
           chmod +x ./docker_build.sh
-          ./docker_build.sh -f ${{ if github.event.inputs.app == 'build-all' }}-a${{ else }}-b ${{ github.event.inputs.app }}${{ endif }} ${{ if github.event.inputs.push == true }}-p${{ endif }}
+          FLAGS="-f"
+          if [ "${{ inputs.app }}" == "build-all" ]; then
+            FLAGS="$FLAGS -a"
+          else
+            FLAGS="$FLAGS -b ${{ inputs.app }}"
+          fi
+          if [ "${{ inputs.push }}" == "true" ]; then
+            FLAGS="$FLAGS -p"
+          fi
+          ./docker_build.sh $FLAGS
