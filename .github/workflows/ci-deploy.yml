@@ -27,7 +27,7 @@ jobs:
   build:
     name: Build All
     permissions: write-all
-    uses: jacobbrewer1/league-manager/.github/workflows/ci-docker.yml@main
+    uses: ./.github/workflows/ci-docker.yml
     secrets: inherit
     with:
       app: ${{ inputs.app }}
