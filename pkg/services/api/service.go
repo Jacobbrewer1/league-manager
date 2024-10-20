@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/api"
-	repo "github.com/Jacobbrewer1/league-manager/pkg/repositories/api"
+	"github.com/jacobbrewer1/league-manager/pkg/codegen/apis/api"
+	repo "github.com/jacobbrewer1/league-manager/pkg/repositories/api"
 )
 
 type service struct {

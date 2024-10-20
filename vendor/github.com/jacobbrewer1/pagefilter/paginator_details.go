@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/Jacobbrewer1/pagefilter/common"
+	"github.com/jacobbrewer1/pagefilter/common"
 )
 
 var (

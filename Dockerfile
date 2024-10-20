@@ -1,6 +1,6 @@
 FROM golang:1.21.1
 
-LABEL org.opencontainers.image.source='https://github.com/Jacobbrewer1/league-manager'
+LABEL org.opencontainers.image.source='https://github.com/jacobbrewer1/league-manager'
 LABEL org.opencontainers.image.description="A system that manages a league's teams, players, and games."
 LABEL org.opencontainers.image.licenses='GNU General Public License v3.0'
 

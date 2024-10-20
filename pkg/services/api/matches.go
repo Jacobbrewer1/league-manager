@@ -7,15 +7,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Jacobbrewer1/goschema/pkg/usql"
-	"github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/api"
-	"github.com/Jacobbrewer1/league-manager/pkg/logging"
-	"github.com/Jacobbrewer1/league-manager/pkg/models"
-	repo "github.com/Jacobbrewer1/league-manager/pkg/repositories/api"
-	"github.com/Jacobbrewer1/league-manager/pkg/utils"
-	"github.com/Jacobbrewer1/pagefilter"
-	"github.com/Jacobbrewer1/pagefilter/common"
-	"github.com/Jacobbrewer1/uhttp"
+	"github.com/jacobbrewer1/goschema/pkg/usql"
+	"github.com/jacobbrewer1/league-manager/pkg/codegen/apis/api"
+	"github.com/jacobbrewer1/league-manager/pkg/logging"
+	"github.com/jacobbrewer1/league-manager/pkg/models"
+	repo "github.com/jacobbrewer1/league-manager/pkg/repositories/api"
+	"github.com/jacobbrewer1/league-manager/pkg/utils"
+	"github.com/jacobbrewer1/pagefilter"
+	"github.com/jacobbrewer1/pagefilter/common"
+	"github.com/jacobbrewer1/uhttp"
 )
 
 func (s *service) GetGames(w http.ResponseWriter, r *http.Request, params api.GetGamesParams) {

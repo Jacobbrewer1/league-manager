@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Jacobbrewer1/league-manager/pkg/models"
-	"github.com/Jacobbrewer1/league-manager/pkg/repositories/api/filters"
-	"github.com/Jacobbrewer1/pagefilter"
+	"github.com/jacobbrewer1/league-manager/pkg/models"
+	"github.com/jacobbrewer1/league-manager/pkg/repositories/api/filters"
+	"github.com/jacobbrewer1/pagefilter"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

@@ -3,7 +3,7 @@ package filters
 import (
 	"strings"
 
-	"github.com/Jacobbrewer1/pagefilter"
+	"github.com/jacobbrewer1/pagefilter"
 )
 
 type teamJoin struct{}
