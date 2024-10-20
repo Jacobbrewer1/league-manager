@@ -13,7 +13,7 @@ import (
 	"net/url"
 	"strings"
 
-	externalRef1 "github.com/Jacobbrewer1/uhttp/common"
+	externalRef1 "github.com/jacobbrewer1/uhttp/common"
 	"github.com/oapi-codegen/runtime"
 )
 

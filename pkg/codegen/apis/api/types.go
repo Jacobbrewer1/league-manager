@@ -4,7 +4,7 @@
 package api
 
 import (
-	externalRef0 "github.com/Jacobbrewer1/pagefilter/common"
+	externalRef0 "github.com/jacobbrewer1/pagefilter/common"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 

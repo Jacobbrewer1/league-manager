@@ -1,18 +1,18 @@
-module github.com/Jacobbrewer1/league-manager
+module github.com/jacobbrewer1/league-manager
 
 go 1.23
 
 toolchain go1.23.1
 
 require (
-	github.com/Jacobbrewer1/goschema v0.0.1
-	github.com/Jacobbrewer1/pagefilter v0.1.3
-	github.com/Jacobbrewer1/patcher v0.1.5
-	github.com/Jacobbrewer1/uhttp v0.0.2
-	github.com/Jacobbrewer1/vaulty v0.1.2
 	github.com/alexliesenfeld/health v0.8.0
 	github.com/google/subcommands v1.2.0
 	github.com/gorilla/mux v1.8.1
+	github.com/jacobbrewer1/goschema v0.0.3
+	github.com/jacobbrewer1/pagefilter v0.1.4
+	github.com/jacobbrewer1/patcher v0.1.6
+	github.com/jacobbrewer1/uhttp v0.0.4
+	github.com/jacobbrewer1/vaulty v0.1.3
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/prometheus/client_golang v1.20.5

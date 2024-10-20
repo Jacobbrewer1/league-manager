@@ -1,6 +1,6 @@
 package filters
 
-import "github.com/Jacobbrewer1/pagefilter"
+import "github.com/jacobbrewer1/pagefilter"
 
 type lastnameLike struct {
 	lnl string

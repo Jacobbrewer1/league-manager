@@ -9,8 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Jacobbrewer1/league-manager/pkg/logging"
 	"github.com/google/subcommands"
+	"github.com/jacobbrewer1/league-manager/pkg/logging"
 )
 
 func main() {

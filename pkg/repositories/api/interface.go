@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/Jacobbrewer1/league-manager/pkg/models"
-	"github.com/Jacobbrewer1/pagefilter"
+	"github.com/jacobbrewer1/league-manager/pkg/models"
+	"github.com/jacobbrewer1/pagefilter"
 )
 
 type Repository interface {

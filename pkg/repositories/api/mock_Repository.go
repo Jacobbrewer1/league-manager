@@ -3,8 +3,8 @@
 package api
 
 import (
-	models "github.com/Jacobbrewer1/league-manager/pkg/models"
-	pagefilter "github.com/Jacobbrewer1/pagefilter"
+	models "github.com/jacobbrewer1/league-manager/pkg/models"
+	pagefilter "github.com/jacobbrewer1/pagefilter"
 	mock "github.com/stretchr/testify/mock"
 )
 

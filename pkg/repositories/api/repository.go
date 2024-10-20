@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/Jacobbrewer1/vaulty/repositories"
+	"github.com/jacobbrewer1/vaulty/repositories"
 )
 
 type repository struct {

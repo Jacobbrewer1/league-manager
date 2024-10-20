@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Jacobbrewer1/league-manager/pkg/codegen/apis/api"
-	"github.com/Jacobbrewer1/league-manager/pkg/models"
+	"github.com/jacobbrewer1/league-manager/pkg/codegen/apis/api"
+	"github.com/jacobbrewer1/league-manager/pkg/models"
 )
 
 func (s *service) modelAsAPIPartnership(m *models.Partnership) (*api.Partnership, error) {

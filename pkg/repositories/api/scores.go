@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 
-	"github.com/Jacobbrewer1/league-manager/pkg/models"
+	"github.com/jacobbrewer1/league-manager/pkg/models"
 )
 
 func (r *repository) GetScoreByMatchAndPartnership(matchID, partnershipID int64) (*models.Score, error) {

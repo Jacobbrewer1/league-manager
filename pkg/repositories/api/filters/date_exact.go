@@ -1,7 +1,7 @@
 package filters
 
 import (
-	"github.com/Jacobbrewer1/pagefilter"
+	"github.com/jacobbrewer1/pagefilter"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
