@@ -141,7 +141,8 @@ jobs:
 
       - name: "Install goschema"
         run: |
-          wget https://github.com/Jacobbrewer1/goschema/releases/download/v0.0.1/goschema
+          url=$(curl -s -X GET https://api.github.com/repos/jacobbrewer1/goschema/releases/latest | jq '.assets[] | select(.name == "goschema")' | jq -r .browser_download_url)
+          wget $url
           chmod +x goschema
           mv goschema /usr/local/bin
 
