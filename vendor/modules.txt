@@ -38,7 +38,7 @@ github.com/charmbracelet/bubbles/textarea
 github.com/charmbracelet/bubbles/textarea/memoization
 github.com/charmbracelet/bubbles/textinput
 github.com/charmbracelet/bubbles/viewport
-# github.com/charmbracelet/bubbletea v1.1.0
+# github.com/charmbracelet/bubbletea v1.1.1
 ## explicit; go 1.18
 github.com/charmbracelet/bubbletea
 # github.com/charmbracelet/huh v0.6.0
@@ -46,6 +46,9 @@ github.com/charmbracelet/bubbletea
 github.com/charmbracelet/huh
 github.com/charmbracelet/huh/accessibility
 github.com/charmbracelet/huh/internal/selector
+# github.com/charmbracelet/huh/spinner v0.0.0-20241011224433-983a50776b31
+## explicit; go 1.19
+github.com/charmbracelet/huh/spinner
 # github.com/charmbracelet/lipgloss v0.13.0
 ## explicit; go 1.18
 github.com/charmbracelet/lipgloss
