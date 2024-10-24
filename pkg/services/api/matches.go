@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/jacobbrewer1/goschema/pkg/usql"
@@ -50,9 +51,11 @@ func (s *service) GetGames(w http.ResponseWriter, r *http.Request, params api.Ge
 		}
 	}
 
-	respMatches := make([]api.Game, 0, len(matches.Items))
+	respMatches := make([]api.GameTeam, 0, len(matches.Items))
 	for _, m := range matches.Items {
-		respMatch := new(api.Game)
+		wg := new(sync.WaitGroup)
+
+		respMatch := new(api.GameTeam)
 		respMatch.Id = utils.Ptr(int64(m.Id))
 		respMatch.MatchDate = utils.Ptr(m.MatchDate.Format(time.RFC3339))
 
@@ -70,59 +73,58 @@ func (s *service) GetGames(w http.ResponseWriter, r *http.Request, params api.Ge
 		}
 		respMatch.Season = modelAsAPISeason(season)
 
-		homePartnership, err := s.r.GetPartnership(int64(m.HomePartnersId))
-		if err != nil {
-			l.Error("Error getting home partnership", slog.String(logging.KeyError, err.Error()))
-			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting home partnership", err)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			homePartnership, err := s.r.GetPartnership(int64(m.HomePartnersId))
+			if err != nil {
+				l.Error("Error getting home partnership", slog.String(logging.KeyError, err.Error()))
+				uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting home partnership", err)
+				return
+			}
+
+			homeTeam, err := s.r.GetTeam(int64(homePartnership.TeamId))
+			if err != nil {
+				l.Error("Error getting home team", slog.String(logging.KeyError, err.Error()))
+				uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting home team", err)
+				return
+			}
+
+			respMatch.HomeTeam = utils.Ptr(homeTeam.Name)
+		}()
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			awayPartnership, err := s.r.GetPartnership(int64(m.AwayPartnersId))
+			if err != nil {
+				l.Error("Error getting away partnership", slog.String(logging.KeyError, err.Error()))
+				uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting away partnership", err)
+				return
+			}
+
+			awayTeam, err := s.r.GetTeam(int64(awayPartnership.TeamId))
+			if err != nil {
+				l.Error("Error getting away team", slog.String(logging.KeyError, err.Error()))
+				uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting away team", err)
+				return
+			}
+
+			respMatch.AwayTeam = utils.Ptr(awayTeam.Name)
+		}()
+
+		resp := &api.GamesResponse{
+			Games: respMatches,
+			Total: matches.Total,
+		}
+
+		if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
+			l.Error("Error encoding response", slog.String(logging.KeyError, err.Error()))
+			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error encoding response", err)
 			return
 		}
-
-		homeAPI, err := s.modelAsAPIPartnership(homePartnership)
-		if err != nil {
-			l.Error("Error getting home partnership", slog.String(logging.KeyError, err.Error()))
-			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting home partnership", err)
-			return
-		}
-
-		homeScore, err := s.r.GetScoreByMatchAndPartnership(int64(m.Id), int64(m.HomePartnersId))
-		if err != nil {
-			l.Error("Error getting home score", slog.String(logging.KeyError, err.Error()))
-			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting home score", err)
-			return
-		}
-
-		respMatch.HomeTeam = &api.GamePartnership{
-			Partnership: homeAPI,
-			Scores:      modelAsAPIScore(homeScore),
-		}
-
-		awayPartnership, err := s.r.GetPartnership(int64(m.AwayPartnersId))
-		if err != nil {
-			l.Error("Error getting away partnership", slog.String(logging.KeyError, err.Error()))
-			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting away partnership", err)
-			return
-		}
-
-		awayAPI, err := s.modelAsAPIPartnership(awayPartnership)
-		if err != nil {
-			l.Error("Error getting away partnership", slog.String(logging.KeyError, err.Error()))
-			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting away partnership", err)
-			return
-		}
-
-		awayScore, err := s.r.GetScoreByMatchAndPartnership(int64(m.Id), int64(m.AwayPartnersId))
-		if err != nil {
-			l.Error("Error getting away score", slog.String(logging.KeyError, err.Error()))
-			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting away score", err)
-			return
-		}
-
-		respMatch.AwayTeam = &api.GamePartnership{
-			Partnership: awayAPI,
-			Scores:      modelAsAPIScore(awayScore),
-		}
-
-		respMatches = append(respMatches, *respMatch)
 	}
 
 	resp := &api.GamesResponse{
@@ -137,18 +139,137 @@ func (s *service) GetGames(w http.ResponseWriter, r *http.Request, params api.Ge
 	}
 }
 
-func modelAsAPIScore(score *models.Score) *api.Scores {
-	s := &api.Scores{
-		FirstSet:  int64(score.FirstSetScore),
-		SecondSet: int64(score.SecondSetScore),
-	}
-
-	if score.ThirdSetScore.Valid {
-		s.ThirdSet = utils.Ptr(score.ThirdSetScore.Int64)
-	}
-
-	return s
+func (s *service) GetGameDetails(w http.ResponseWriter, r *http.Request, gameId int64) {
+	//l := logging.LoggerFromRequest(r)
+	//
+	//sortDir := new(common.SortDirection)
+	//if params.SortDir != nil {
+	//	sortDir = (*common.SortDirection)(params.SortDir)
+	//}
+	//
+	//paginationDetails := pagefilter.GetPaginatorDetails(params.Limit, params.LastVal, params.LastId, params.SortBy, sortDir)
+	//
+	//filts, err := s.getMatchesFilters(params.Season, params.Team, params.Date, params.DateMin, params.DateMax)
+	//if err != nil {
+	//	l.Error("Failed to parse filters", slog.String(logging.KeyError, err.Error()))
+	//	uhttp.SendErrorMessageWithStatus(w, http.StatusBadRequest, "failed to parse filters", err)
+	//	return
+	//}
+	//
+	//matches, err := s.r.GetGames(paginationDetails, filts)
+	//if err != nil {
+	//	switch {
+	//	case errors.Is(err, repo.ErrMatchNotFound):
+	//		matches = &pagefilter.PaginatedResponse[models.Game]{
+	//			Items: make([]*models.Game, 0),
+	//			Total: 0,
+	//		}
+	//	default:
+	//		l.Error("Error getting matches", slog.String(logging.KeyError, err.Error()))
+	//		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting matches", err)
+	//		return
+	//	}
+	//}
+	//
+	//respMatches := make([]api.Game, 0, len(matches.Items))
+	//for _, m := range matches.Items {
+	//	respMatch := new(api.Game)
+	//	respMatch.Id = utils.Ptr(int64(m.Id))
+	//	respMatch.MatchDate = utils.Ptr(m.MatchDate.Format(time.RFC3339))
+	//
+	//	winningTeam := api.WinningTeam_home
+	//	if string(m.WinningTeam) == models.GameWinningTeamAway {
+	//		winningTeam = api.WinningTeam_away
+	//	}
+	//	respMatch.WinningTeam = &winningTeam
+	//
+	//	season, err := s.r.GetSeason(int64(m.SeasonId))
+	//	if err != nil {
+	//		l.Error("Error getting season", slog.String(logging.KeyError, err.Error()))
+	//		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting season", err)
+	//		return
+	//	}
+	//	respMatch.Season = modelAsAPISeason(season)
+	//
+	//	homePartnership, err := s.r.GetPartnership(int64(m.HomePartnersId))
+	//	if err != nil {
+	//		l.Error("Error getting home partnership", slog.String(logging.KeyError, err.Error()))
+	//		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting home partnership", err)
+	//		return
+	//	}
+	//
+	//	homeAPI, err := s.modelAsAPIPartnership(homePartnership)
+	//	if err != nil {
+	//		l.Error("Error getting home partnership", slog.String(logging.KeyError, err.Error()))
+	//		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting home partnership", err)
+	//		return
+	//	}
+	//
+	//	homeScore, err := s.r.GetScoreByMatchAndPartnership(int64(m.Id), int64(m.HomePartnersId))
+	//	if err != nil {
+	//		l.Error("Error getting home score", slog.String(logging.KeyError, err.Error()))
+	//		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting home score", err)
+	//		return
+	//	}
+	//
+	//	respMatch.HomeTeam = &api.GamePartnership{
+	//		Partnership: homeAPI,
+	//		Scores:      modelAsAPIScore(homeScore),
+	//	}
+	//
+	//	awayPartnership, err := s.r.GetPartnership(int64(m.AwayPartnersId))
+	//	if err != nil {
+	//		l.Error("Error getting away partnership", slog.String(logging.KeyError, err.Error()))
+	//		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting away partnership", err)
+	//		return
+	//	}
+	//
+	//	awayAPI, err := s.modelAsAPIPartnership(awayPartnership)
+	//	if err != nil {
+	//		l.Error("Error getting away partnership", slog.String(logging.KeyError, err.Error()))
+	//		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting away partnership", err)
+	//		return
+	//	}
+	//
+	//	awayScore, err := s.r.GetScoreByMatchAndPartnership(int64(m.Id), int64(m.AwayPartnersId))
+	//	if err != nil {
+	//		l.Error("Error getting away score", slog.String(logging.KeyError, err.Error()))
+	//		uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error getting away score", err)
+	//		return
+	//	}
+	//
+	//	respMatch.AwayTeam = &api.GamePartnership{
+	//		Partnership: awayAPI,
+	//		Scores:      modelAsAPIScore(awayScore),
+	//	}
+	//
+	//	respMatches = append(respMatches, *respMatch)
+	//}
+	//
+	//resp := &api.GamesResponse{
+	//	Games: respMatches,
+	//	Total: matches.Total,
+	//}
+	//
+	//if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
+	//	l.Error("Error encoding response", slog.String(logging.KeyError, err.Error()))
+	//	uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error encoding response", err)
+	//	return
+	//}
 }
+
+//func modelAsAPIScore(score *models.Score) *api.Scores {
+//	s := &api.Scores{
+//		FirstSet:  int64(score.FirstSetScore),
+//		SecondSet: int64(score.SecondSetScore),
+//	}
+//
+//	if score.ThirdSetScore.Valid {
+//		s.ThirdSet = utils.Ptr(score.ThirdSetScore.Int64)
+//	}
+//
+//	return s
+//}
 
 func (s *service) getMatchesFilters(
 	season *api.QuerySeason,

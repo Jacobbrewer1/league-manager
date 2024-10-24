@@ -686,7 +686,7 @@ components:
         games:
           type: array
           items:
-            $ref: '#/components/schemas/game'
+            $ref: '#/components/schemas/game_team'
         total:
           type: integer
           format: int64
@@ -703,6 +703,24 @@ components:
           $ref: '#/components/schemas/game_partnership'
         away_team:
           $ref: '#/components/schemas/game_partnership'
+        match_date:
+          type: string
+          format: datetime
+        winning_team:
+          $ref: '#/components/schemas/winning_team'
+
+    game_team:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        season:
+          $ref: '#/components/schemas/season'
+        home_team:
+          type: string
+        away_team:
+          type: string
         match_date:
           type: string
           format: datetime
