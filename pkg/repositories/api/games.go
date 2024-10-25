@@ -72,6 +72,13 @@ func (r *repository) GetGames(details *pagefilter.PaginatorDetails, filters *Get
 	}, nil
 }
 
+func (r *repository) GetGameDetails(details *pagefilter.PaginatorDetails, gameID int64) (*pagefilter.PaginatedResponse[models.Game], error) {
+	t := prometheus.NewTimer(models.DatabaseLatency.WithLabelValues("get_matches"))
+	defer t.ObserveDuration()
+
+	return nil, nil
+}
+
 func (r *repository) getMatchesFilters(got *GetMatchesFilters) *pagefilter.MultiFilter {
 	mf := pagefilter.NewMultiFilter()
 	if got == nil {
@@ -113,4 +120,18 @@ func (r *repository) CreateMatch(match *models.Game) error {
 	}
 
 	return nil
+}
+
+func (r *repository) GetGame(id int64) (*models.Game, error) {
+	g, err := models.GameById(r.db, int(id))
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrMatchNotFound
+		default:
+			return nil, fmt.Errorf("get match: %w", err)
+		}
+	}
+
+	return g, nil
 }

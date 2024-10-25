@@ -85,6 +85,36 @@ func (_m *MockRepository) CreateTeam(team *models.Team) error {
 	return r0
 }
 
+// GetGame provides a mock function with given fields: id
+func (_m *MockRepository) GetGame(id int64) (*models.Game, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetGame")
+	}
+
+	var r0 *models.Game
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int64) (*models.Game, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int64) *models.Game); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Game)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetGames provides a mock function with given fields: details, filters
 func (_m *MockRepository) GetGames(details *pagefilter.PaginatorDetails, filters *GetMatchesFilters) (*pagefilter.PaginatedResponse[models.Game], error) {
 	ret := _m.Called(details, filters)

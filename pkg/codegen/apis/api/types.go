@@ -24,10 +24,20 @@ type GamePartnership struct {
 	Scores      *Scores      `json:"scores,omitempty"`
 }
 
+// GameTeam defines the model for game_team.
+type GameTeam struct {
+	AwayTeam    *string      `json:"away_team,omitempty"`
+	HomeTeam    *string      `json:"home_team,omitempty"`
+	Id          *int64       `json:"id,omitempty"`
+	MatchDate   *string      `json:"match_date,omitempty"`
+	Season      *Season      `json:"season,omitempty"`
+	WinningTeam *WinningTeam `json:"winning_team,omitempty"`
+}
+
 // GamesResponse defines the model for games_response.
 type GamesResponse struct {
-	Games []Game `json:"games"`
-	Total int64  `json:"total"`
+	Games []GameTeam `json:"games"`
+	Total int64      `json:"total"`
 }
 
 // Partnership defines the model for partnership.
@@ -231,6 +241,12 @@ type CreateGameJSONRequestBody = Game
 
 // Temporary inclusion of type alias for backwards compatibility
 type CreateGameJSONBody = Game
+
+// UpdateGameJSONRequestBody defines body for UpdateGame for application/json ContentType.
+type UpdateGameJSONRequestBody = Game
+
+// Temporary inclusion of type alias for backwards compatibility
+type UpdateGameJSONBody = Game
 
 // CreatePlayerJSONRequestBody defines body for CreatePlayer for application/json ContentType.
 type CreatePlayerJSONRequestBody = Player

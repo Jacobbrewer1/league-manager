@@ -21,6 +21,12 @@ type ServerInterface interface {
 	// Create a game
 	// (POST /games)
 	CreateGame(w http.ResponseWriter, r *http.Request, body0 *CreateGameJSONBody)
+	// Get a game by ID
+	// (GET /games/{id})
+	GetGameByID(w http.ResponseWriter, r *http.Request, id int64)
+	// Update a game
+	// (PATCH /games/{id})
+	UpdateGame(w http.ResponseWriter, r *http.Request, id int64, body0 *UpdateGameJSONBody)
 	// Get all players
 	// (GET /players)
 	GetPlayers(w http.ResponseWriter, r *http.Request, params GetPlayersParams)
@@ -234,6 +240,79 @@ func (siw *ServerInterfaceWrapper) CreateGame(w http.ResponseWriter, r *http.Req
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.handler.CreateGame(w, r, body)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
+// GetGameByID operation middleware
+func (siw *ServerInterfaceWrapper) GetGameByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", mux.Vars(r)["id"], &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.GetGameByID(w, r, id)
+	}))
+
+	handler.ServeHTTP(cw, r.WithContext(ctx))
+}
+
+// UpdateGame operation middleware
+func (siw *ServerInterfaceWrapper) UpdateGame(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	cw := uhttp.NewResponseWriter(w,
+		uhttp.WithDefaultStatusCode(http.StatusOK),
+		uhttp.WithDefaultHeader("X-Request-ID", uhttp.RequestIDFromContext(ctx)),
+		uhttp.WithDefaultHeader(uhttp.HeaderContentType, uhttp.ContentTypeJSON),
+	)
+
+	defer func() {
+		if siw.metricsMiddleware != nil {
+			siw.metricsMiddleware(cw, r)
+		}
+	}()
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", mux.Vars(r)["id"], &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.errorHandlerFunc(cw, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Body parameter for UpdateGame for application/json ContentType -------------
+	body := new(UpdateGameJSONRequestBody)
+	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+		siw.errorHandlerFunc(cw, r, &UnmarshalingParamError{ParamName: "body", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.handler.UpdateGame(w, r, id, body)
 	}))
 
 	handler.ServeHTTP(cw, r.WithContext(ctx))
@@ -896,6 +975,8 @@ func RegisterUnauthedHandlers(router *mux.Router, si ServerInterface, opts ...Se
 
 	router.Methods(http.MethodGet).Path("/games").Handler(wrapHandler(wrapper.GetGames))
 	router.Methods(http.MethodPost).Path("/games").Handler(wrapHandler(wrapper.CreateGame))
+	router.Methods(http.MethodGet).Path("/games/{id}").Handler(wrapHandler(wrapper.GetGameByID))
+	router.Methods(http.MethodPatch).Path("/games/{id}").Handler(wrapHandler(wrapper.UpdateGame))
 	router.Methods(http.MethodGet).Path("/players").Handler(wrapHandler(wrapper.GetPlayers))
 	router.Methods(http.MethodPost).Path("/players").Handler(wrapHandler(wrapper.CreatePlayer))
 	router.Methods(http.MethodGet).Path("/players/{id}").Handler(wrapHandler(wrapper.GetPlayerByID))

@@ -59,4 +59,7 @@ type Repository interface {
 
 	// CreateMatch creates a match.
 	CreateMatch(match *models.Game) error
+
+	// GetGame gets a match by ID.
+	GetGame(id int64) (*models.Game, error)
 }
