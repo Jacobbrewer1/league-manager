@@ -154,3 +154,6 @@ jobs:
 
       - name: "Check for changes"
         run: git diff --exit-code
+
+      - name: "Check for new files"
+        run: git diff --exit-code --name-only
