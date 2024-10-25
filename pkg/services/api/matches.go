@@ -115,16 +115,9 @@ func (s *service) GetGames(w http.ResponseWriter, r *http.Request, params api.Ge
 			respMatch.AwayTeam = utils.Ptr(awayTeam.Name)
 		}()
 
-		resp := &api.GamesResponse{
-			Games: respMatches,
-			Total: matches.Total,
-		}
+		wg.Wait()
 
-		if err := uhttp.Encode(w, http.StatusOK, resp); err != nil {
-			l.Error("Error encoding response", slog.String(logging.KeyError, err.Error()))
-			uhttp.SendErrorMessageWithStatus(w, http.StatusInternalServerError, "error encoding response", err)
-			return
-		}
+		respMatches = append(respMatches, *respMatch)
 	}
 
 	resp := &api.GamesResponse{
