@@ -121,3 +121,17 @@ func (r *repository) CreateMatch(match *models.Game) error {
 
 	return nil
 }
+
+func (r *repository) GetGame(id int64) (*models.Game, error) {
+	g, err := models.GameById(r.db, int(id))
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrMatchNotFound
+		default:
+			return nil, fmt.Errorf("get match: %w", err)
+		}
+	}
+
+	return g, nil
+}

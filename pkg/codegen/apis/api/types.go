@@ -242,6 +242,12 @@ type CreateGameJSONRequestBody = Game
 // Temporary inclusion of type alias for backwards compatibility
 type CreateGameJSONBody = Game
 
+// UpdateGameJSONRequestBody defines body for UpdateGame for application/json ContentType.
+type UpdateGameJSONRequestBody = Game
+
+// Temporary inclusion of type alias for backwards compatibility
+type UpdateGameJSONBody = Game
+
 // CreatePlayerJSONRequestBody defines body for CreatePlayer for application/json ContentType.
 type CreatePlayerJSONRequestBody = Player
 

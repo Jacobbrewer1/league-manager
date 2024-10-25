@@ -109,7 +109,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/message'
         '500':
           description: Internal server error
           content:
@@ -153,7 +153,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/message'
         '500':
           description: Internal server error
           content:
@@ -256,7 +256,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/message'
         '500':
           description: Internal server error
           content:
@@ -300,7 +300,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/message'
         '500':
           description: Internal server error
           content:
@@ -403,7 +403,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/message'
         '500':
           description: Internal server error
           content:
@@ -447,7 +447,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/message'
         '500':
           description: Internal server error
           content:
@@ -515,6 +515,90 @@ paths:
             application/json:
               schema:
                 $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+
+  /games/{id}:
+    get:
+      tags:
+        - games
+      summary: Get a game by ID
+      operationId: getGameByID
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the game
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A game
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/game'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+        '404':
+          description: Game not found
+          content:
+            application/json:
+              schema:
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/message'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+    patch:
+      tags:
+        - games
+      summary: Update a game
+      operationId: updateGame
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the game
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/game'
+      responses:
+        '200':
+          description: Game updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/game'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/error_message'
+        '404':
+          description: Game not found
+          content:
+            application/json:
+              schema:
+                $ref: '../../../../vendor/github.com/jacobbrewer1/uhttp/common/common.yaml#/components/schemas/message'
         '500':
           description: Internal server error
           content:

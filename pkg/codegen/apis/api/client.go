@@ -98,6 +98,14 @@ type ClientInterface interface {
 
 	CreateGame(ctx context.Context, body CreateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetGameByID request
+	GetGameByID(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateGameWithBody request with any body
+	UpdateGameWithBody(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateGame(ctx context.Context, id int64, body UpdateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetPlayers request
 	GetPlayers(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -173,6 +181,42 @@ func (c *Client) CreateGameWithBody(ctx context.Context, contentType string, bod
 
 func (c *Client) CreateGame(ctx context.Context, body CreateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateGameRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetGameByID(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetGameByIDRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateGameWithBody(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateGameRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateGame(ctx context.Context, id int64, body UpdateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateGameRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -623,6 +667,87 @@ func NewCreateGameRequestWithBody(server string, contentType string, body io.Rea
 	}
 
 	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetGameByIDRequest generates requests for GetGameByID
+func NewGetGameByIDRequest(server string, id int64) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/games/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateGameRequest calls the generic UpdateGame builder with application/json body
+func NewUpdateGameRequest(server string, id int64, body UpdateGameJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateGameRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewUpdateGameRequestWithBody generates requests for UpdateGame with any type of body
+func NewUpdateGameRequestWithBody(server string, id int64, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/games/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -1449,6 +1574,14 @@ type ClientWithResponsesInterface interface {
 
 	CreateGameWithResponse(ctx context.Context, body CreateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateGameResponse, error)
 
+	// GetGameByIDWithResponse request
+	GetGameByIDWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*GetGameByIDResponse, error)
+
+	// UpdateGameWithBodyWithResponse request with any body
+	UpdateGameWithBodyWithResponse(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateGameResponse, error)
+
+	UpdateGameWithResponse(ctx context.Context, id int64, body UpdateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateGameResponse, error)
+
 	// GetPlayersWithResponse request
 	GetPlayersWithResponse(ctx context.Context, params *GetPlayersParams, reqEditors ...RequestEditorFn) (*GetPlayersResponse, error)
 
@@ -1546,6 +1679,56 @@ func (r CreateGameResponse) StatusCode() int {
 	return 0
 }
 
+type GetGameByIDResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Game
+	JSON400      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.Message
+	JSON500      *externalRef1.ErrorMessage
+}
+
+// Status returns HTTPResponse.Status
+func (r GetGameByIDResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetGameByIDResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateGameResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Game
+	JSON400      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.Message
+	JSON500      *externalRef1.ErrorMessage
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateGameResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateGameResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetPlayersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -1599,7 +1782,7 @@ type GetPlayerByIDResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *Player
 	JSON400      *externalRef1.ErrorMessage
-	JSON404      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.Message
 	JSON500      *externalRef1.ErrorMessage
 }
 
@@ -1624,7 +1807,7 @@ type UpdatePlayerResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *Player
 	JSON400      *externalRef1.ErrorMessage
-	JSON404      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.Message
 	JSON500      *externalRef1.ErrorMessage
 }
 
@@ -1697,7 +1880,7 @@ type GetSeasonByIDResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *Season
 	JSON400      *externalRef1.ErrorMessage
-	JSON404      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.Message
 	JSON500      *externalRef1.ErrorMessage
 }
 
@@ -1722,7 +1905,7 @@ type UpdateSeasonResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *Season
 	JSON400      *externalRef1.ErrorMessage
-	JSON404      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.Message
 	JSON500      *externalRef1.ErrorMessage
 }
 
@@ -1795,7 +1978,7 @@ type GetTeamByIDResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *Team
 	JSON400      *externalRef1.ErrorMessage
-	JSON404      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.Message
 	JSON500      *externalRef1.ErrorMessage
 }
 
@@ -1820,7 +2003,7 @@ type UpdateTeamResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *Team
 	JSON400      *externalRef1.ErrorMessage
-	JSON404      *externalRef1.ErrorMessage
+	JSON404      *externalRef1.Message
 	JSON500      *externalRef1.ErrorMessage
 }
 
@@ -1864,6 +2047,32 @@ func (c *ClientWithResponses) CreateGameWithResponse(ctx context.Context, body C
 		return nil, err
 	}
 	return ParseCreateGameResponse(rsp)
+}
+
+// GetGameByIDWithResponse request returning *GetGameByIDResponse
+func (c *ClientWithResponses) GetGameByIDWithResponse(ctx context.Context, id int64, reqEditors ...RequestEditorFn) (*GetGameByIDResponse, error) {
+	rsp, err := c.GetGameByID(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetGameByIDResponse(rsp)
+}
+
+// UpdateGameWithBodyWithResponse request with arbitrary body returning *UpdateGameResponse
+func (c *ClientWithResponses) UpdateGameWithBodyWithResponse(ctx context.Context, id int64, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateGameResponse, error) {
+	rsp, err := c.UpdateGameWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateGameResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateGameWithResponse(ctx context.Context, id int64, body UpdateGameJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateGameResponse, error) {
+	rsp, err := c.UpdateGame(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateGameResponse(rsp)
 }
 
 // GetPlayersWithResponse request returning *GetPlayersResponse
@@ -2102,6 +2311,100 @@ func ParseCreateGameResponse(rsp *http.Response) (*CreateGameResponse, error) {
 	return response, nil
 }
 
+// ParseGetGameByIDResponse parses an HTTP response from a GetGameByIDWithResponse call
+func ParseGetGameByIDResponse(rsp *http.Response) (*GetGameByIDResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetGameByIDResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Game
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest externalRef1.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest externalRef1.Message
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest externalRef1.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateGameResponse parses an HTTP response from a UpdateGameWithResponse call
+func ParseUpdateGameResponse(rsp *http.Response) (*UpdateGameResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateGameResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Game
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest externalRef1.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest externalRef1.Message
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest externalRef1.ErrorMessage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetPlayersResponse parses an HTTP response from a GetPlayersWithResponse call
 func ParseGetPlayersResponse(rsp *http.Response) (*GetPlayersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2211,7 +2514,7 @@ func ParseGetPlayerByIDResponse(rsp *http.Response) (*GetPlayerByIDResponse, err
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef1.ErrorMessage
+		var dest externalRef1.Message
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2258,7 +2561,7 @@ func ParseUpdatePlayerResponse(rsp *http.Response) (*UpdatePlayerResponse, error
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef1.ErrorMessage
+		var dest externalRef1.Message
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2385,7 +2688,7 @@ func ParseGetSeasonByIDResponse(rsp *http.Response) (*GetSeasonByIDResponse, err
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef1.ErrorMessage
+		var dest externalRef1.Message
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2432,7 +2735,7 @@ func ParseUpdateSeasonResponse(rsp *http.Response) (*UpdateSeasonResponse, error
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef1.ErrorMessage
+		var dest externalRef1.Message
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2559,7 +2862,7 @@ func ParseGetTeamByIDResponse(rsp *http.Response) (*GetTeamByIDResponse, error) 
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef1.ErrorMessage
+		var dest externalRef1.Message
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2606,7 +2909,7 @@ func ParseUpdateTeamResponse(rsp *http.Response) (*UpdateTeamResponse, error) {
 		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest externalRef1.ErrorMessage
+		var dest externalRef1.Message
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
