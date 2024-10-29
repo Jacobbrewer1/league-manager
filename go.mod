@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/jacobbrewer1/goschema v0.0.4
 	github.com/jacobbrewer1/pagefilter v0.1.4
-	github.com/jacobbrewer1/patcher v0.1.6
+	github.com/jacobbrewer1/patcher v0.1.9
 	github.com/jacobbrewer1/uhttp v0.0.4
 	github.com/jacobbrewer1/vaulty v0.1.3
 	github.com/jmoiron/sqlx v1.4.0
