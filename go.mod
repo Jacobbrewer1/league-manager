@@ -8,7 +8,7 @@ require (
 	github.com/alexliesenfeld/health v0.8.0
 	github.com/google/subcommands v1.2.0
 	github.com/gorilla/mux v1.8.1
-	github.com/jacobbrewer1/goschema v0.0.4
+	github.com/jacobbrewer1/goschema v0.0.5
 	github.com/jacobbrewer1/pagefilter v0.1.4
 	github.com/jacobbrewer1/patcher v0.1.9
 	github.com/jacobbrewer1/uhttp v0.0.4
