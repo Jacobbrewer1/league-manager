@@ -9,7 +9,7 @@ require (
 	github.com/google/subcommands v1.2.0
 	github.com/gorilla/mux v1.8.1
 	github.com/jacobbrewer1/goschema v0.0.5
-	github.com/jacobbrewer1/pagefilter v0.1.4
+	github.com/jacobbrewer1/pagefilter v0.1.5
 	github.com/jacobbrewer1/patcher v0.1.10
 	github.com/jacobbrewer1/uhttp v0.0.4
 	github.com/jacobbrewer1/vaulty v0.1.3
@@ -17,8 +17,8 @@ require (
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/viper v1.19.0
-	github.com/stretchr/testify v1.9.0
-	github.com/vektra/mockery/v2 v2.46.3
+	github.com/stretchr/testify v1.10.0
+	github.com/vektra/mockery/v2 v2.47.0
 	golang.org/x/crypto v0.28.0
 )
 
@@ -86,6 +86,5 @@ require (
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

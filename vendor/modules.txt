@@ -101,7 +101,7 @@ github.com/inconshreveable/mousetrap
 # github.com/jacobbrewer1/goschema v0.0.5
 ## explicit; go 1.23
 github.com/jacobbrewer1/goschema/pkg/usql
-# github.com/jacobbrewer1/pagefilter v0.1.4
+# github.com/jacobbrewer1/pagefilter v0.1.5
 ## explicit; go 1.23
 github.com/jacobbrewer1/pagefilter
 github.com/jacobbrewer1/pagefilter/common
@@ -235,15 +235,16 @@ github.com/spf13/viper/internal/features
 # github.com/stretchr/objx v0.5.2
 ## explicit; go 1.20
 github.com/stretchr/objx
-# github.com/stretchr/testify v1.9.0
+# github.com/stretchr/testify v1.10.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
+github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
 # github.com/subosito/gotenv v1.6.0
 ## explicit; go 1.18
 github.com/subosito/gotenv
-# github.com/vektra/mockery/v2 v2.46.3
+# github.com/vektra/mockery/v2 v2.47.0
 ## explicit; go 1.23
 github.com/vektra/mockery/v2
 github.com/vektra/mockery/v2/cmd
@@ -362,9 +363,6 @@ google.golang.org/protobuf/types/known/timestamppb
 # gopkg.in/ini.v1 v1.67.0
 ## explicit
 gopkg.in/ini.v1
-# gopkg.in/yaml.v2 v2.4.0
-## explicit; go 1.15
-gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
